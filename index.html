@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTodo - 像素风格清单应用</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/pixel.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title" onclick="app.showView('checklists')" style="cursor: pointer;" title="返回主页">📋 MyTodo</h1>
+                <div class="header-actions">
+                    <button id="newChecklistBtn" class="btn btn-primary pixel-btn" title="新建清单">
+                        ✚
+                    </button>
+                    <button id="templatesBtn" class="btn btn-secondary pixel-btn" title="模板管理">
+                        📝
+                    </button>
+                    <button id="statsBtn" class="btn btn-secondary pixel-btn" title="数据统计">
+                        📊
+                    </button>
+                    <button id="archiveBtn" class="btn btn-secondary pixel-btn" title="归档">
+                        📦
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 清单列表视图 -->
+            <div id="checklistsView" class="view active">
+                <div class="checklists-container">
+                    <div id="checklistsList" class="checklists-grid">
+                        <!-- 清单卡片将在这里动态生成 -->
+                    </div>
+                    <div id="emptyState" class="empty-state hidden">
+                        <div class="empty-icon">📋</div>
+                        <h3>还没有清单</h3>
+                        <p>点击"新建清单"开始创建您的第一个清单</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 清单详情视图 -->
+            <div id="checklistDetailView" class="view">
+                <div class="checklist-detail">
+                    <div class="detail-header">
+                        <button id="backBtn" class="btn btn-secondary pixel-btn" title="返回">
+                            ←
+                        </button>
+                        <div class="checklist-info">
+                            <h2 id="checklistTitle"></h2>
+                            <div class="checklist-stats">
+                                <span id="completedTasks" class="stat">已完成: 0</span>
+                                <span id="totalTime" class="stat">总时长: 00:00:00</span>
+                                <span id="remainingTime" class="stat">剩余: 00:00:00</span>
+                            </div>
+                        </div>
+                        <div class="detail-actions">
+                            <button id="finishChecklistBtn" class="btn btn-success pixel-btn" title="结束清单">
+                                ✓
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="tasks-container">
+                        <div class="add-task-section">
+                            <h3 style="margin: 0; color: var(--gray-800); font-size: 1.125rem; font-weight: 600;">添加新任务</h3>
+                            <div class="add-task-form">
+                                <div class="add-task-field" style="flex: 1;">
+                                    <label for="newTaskInput">任务名称</label>
+                                    <input type="text" id="newTaskInput" class="pixel-input">
+                                </div>
+                                <div class="add-task-field">
+                                    <label for="taskDurationInput">时长 (分钟)</label>
+                                    <input type="number" id="taskDurationInput" class="pixel-input duration-input" min="1" value="30">
+                                </div>
+                                <div class="add-task-field">
+                                    <label for="taskTypeSelect">计时类型</label>
+                                    <select id="taskTypeSelect" class="pixel-select">
+                                        <option value="timer">正计时</option>
+                                        <option value="countdown">倒计时</option>
+                                    </select>
+                                </div>
+                                <div class="add-task-field">
+                                    <button id="addTaskBtn" class="btn btn-primary pixel-btn" title="添加任务" style="margin-top: 1.625rem;">✚</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="tasksList" class="tasks-list">
+                            <!-- 任务列表将在这里动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模板管理视图 -->
+            <div id="templatesView" class="view">
+                <div class="templates-container">
+                    <div class="templates-header">
+                        <h2>清单模板</h2>
+                        <button id="newTemplateBtn" class="btn btn-primary pixel-btn" title="新建模板">
+                            ✚
+                        </button>
+                    </div>
+                    <div id="templatesList" class="templates-list">
+                        <!-- 模板列表将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据统计视图 -->
+            <div id="statsView" class="view">
+                <div class="stats-container">
+                    <h2 style="margin-bottom: 30px; color: var(--gray-800); font-size: 1.75rem; font-weight: 700;">📊 数据统计</h2>
+                    
+                    <!-- 总体统计 -->
+                    <div class="stats-grid">
+                        <div class="stats-card">
+                            <div class="stats-value" id="totalChecklists">0</div>
+                            <div class="stats-label">总清单数</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-value" id="completedChecklists">0</div>
+                            <div class="stats-label">已完成清单</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-value" id="totalTasks">0</div>
+                            <div class="stats-label">总任务数</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-value" id="completedTasks">0</div>
+                            <div class="stats-label">已完成任务</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-value" id="totalWorkTime">00:00:00</div>
+                            <div class="stats-label">总工作时间</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-value" id="averageWorkTime">00:00:00</div>
+                            <div class="stats-label">平均每日工作时间</div>
+                        </div>
+                    </div>
+
+                    <!-- 最近完成的清单 -->
+                    <div class="stats-section" style="margin-top: 40px;">
+                        <h3 style="margin-bottom: 20px; color: var(--gray-700); font-size: 1.25rem; font-weight: 600;">最近完成的清单</h3>
+                        <div id="recentCompletedChecklists" class="archived-list">
+                            <!-- 最近完成的清单将在这里显示 -->
+                        </div>
+                    </div>
+
+                    <!-- 效率分析 -->
+                    <div class="stats-section" style="margin-top: 40px;">
+                        <h3 style="margin-bottom: 20px; color: var(--gray-700); font-size: 1.25rem; font-weight: 600;">效率分析</h3>
+                        <div class="efficiency-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">任务完成率</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress-circle" style="text-align: center;">
+                                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-500);" id="taskCompletionRate">0%</div>
+                                        <div style="color: var(--gray-600); font-size: 0.875rem;">总体完成率</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">清单完成率</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress-circle" style="text-align: center;">
+                                        <div style="font-size: 2rem; font-weight: 700; color: var(--success-500);" id="checklistCompletionRate">0%</div>
+                                        <div style="color: var(--gray-600); font-size: 0.875rem;">清单完成率</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 归档视图 -->
+            <div id="archiveView" class="view">
+                <div class="archive-container">
+                    <h2>已归档的清单</h2>
+                    <div id="archivedList" class="archived-list">
+                        <!-- 归档清单将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 模态对话框 -->
+        <div id="modal" class="modal hidden">
+            <div class="modal-content pixel-border">
+                <div class="modal-header">
+                    <h3 id="modalTitle"></h3>
+                    <button id="closeModal" class="close-btn">&times;</button>
+                </div>
+                <div id="modalBody" class="modal-body">
+                    <!-- 模态框内容将在这里动态生成 -->
+                </div>
+                <div class="modal-footer">
+                    <button id="modalCancelBtn" class="btn btn-secondary pixel-btn" title="取消">✕</button>
+                    <button id="modalConfirmBtn" class="btn btn-primary pixel-btn" title="确认">✓</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知容器 -->
+        <div id="notifications" class="notifications-container">
+            <!-- 通知将在这里动态生成 -->
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/checklist.js"></script>
+    <script src="js/task.js"></script>
+    <script src="js/template.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/utils.js"></script>
+</body>
+</html>
