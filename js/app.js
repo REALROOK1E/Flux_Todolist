@@ -32,29 +32,111 @@ class TodoApp {
 
     async loadData() {
         try {
+            const loadingNotification = this.showNotification('正在加载数据...', 'info');
             this.data = await window.electronAPI.getData();
             console.log('数据加载成功:', this.data);
+            
+            // 数据验证和修复
+            this.validateAndFixData();
+            
+            // 移除加载通知
+            if (loadingNotification && loadingNotification.remove) {
+                loadingNotification.remove();
+            }
         } catch (error) {
             console.error('加载数据失败:', error);
-            this.showNotification('加载数据失败', 'error');
+            this.showNotification('加载数据失败，使用默认数据', 'error');
+            // 使用默认数据结构
+            this.data = {
+                checklists: [],
+                archivedChecklists: [],
+                templates: [],
+                settings: {}
+            };
         }
+    }
+
+    // 数据验证和修复
+    validateAndFixData() {
+        // 确保必要的数据结构存在
+        if (!this.data.checklists) this.data.checklists = [];
+        if (!this.data.archivedChecklists) this.data.archivedChecklists = [];
+        if (!this.data.templates) this.data.templates = [];
+        if (!this.data.settings) this.data.settings = {};
+
+        // 验证清单数据
+        this.data.checklists = this.data.checklists.filter(checklist => {
+            if (!checklist || !checklist.id || !checklist.name) return false;
+            if (!Array.isArray(checklist.tasks)) checklist.tasks = [];
+            
+            // 验证任务数据
+            checklist.tasks = checklist.tasks.filter(task => {
+                if (!task || !task.id || !task.title) return false;
+                if (typeof task.duration !== 'number') task.duration = 0;
+                if (typeof task.spentTime !== 'number') task.spentTime = 0;
+                if (typeof task.completed !== 'boolean') task.completed = false;
+                if (typeof task.isRunning !== 'boolean') task.isRunning = false;
+                if (!Array.isArray(task.subtasks)) task.subtasks = [];
+                return true;
+            });
+            
+            return true;
+        });
+
+        console.log('数据验证完成');
     }
 
     async saveData() {
         try {
             await window.electronAPI.saveData(this.data);
             console.log('数据保存成功');
+            return true;
         } catch (error) {
             console.error('保存数据失败:', error);
             this.showNotification('保存数据失败', 'error');
+            return false;
         }
+    }
+
+    // 防抖保存 - 避免频繁保存
+    debouncedSave = this.debounce(async () => {
+        await this.saveData();
+    }, 1000);
+
+    // 防抖工具函数
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
 
     startAutoSave() {
         // 每30秒自动保存一次
-        setInterval(() => {
+        this.autoSaveInterval = setInterval(() => {
             this.saveData();
         }, 30000);
+    }
+
+    // 清理资源
+    cleanup() {
+        // 清理自动保存定时器
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+        }
+        
+        // 清理所有任务计时器
+        this.timers.forEach((timer, taskId) => {
+            clearInterval(timer);
+        });
+        this.timers.clear();
+        
+        console.log('应用资源清理完成');
     }
 
     initEventListeners() {
@@ -103,9 +185,62 @@ class TodoApp {
 
         // 键盘快捷键
         document.addEventListener('keydown', (e) => {
+            // Escape 键关闭模态框
             if (e.key === 'Escape') {
                 this.hideModal();
+                return;
             }
+            
+            // Ctrl+S 保存数据
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                this.saveData();
+                this.showNotification('数据已保存', 'success');
+                return;
+            }
+            
+            // Ctrl+N 新建清单
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                if (this.currentView === 'checklists') {
+                    this.showCreateChecklistModal();
+                } else if (this.currentView === 'templates') {
+                    this.showCreateTemplateModal();
+                }
+                return;
+            }
+            
+            // F1 显示帮助
+            if (e.key === 'F1') {
+                e.preventDefault();
+                this.showHelpModal();
+                return;
+            }
+            
+            // 数字键快速导航
+            if (e.altKey && !isNaN(parseInt(e.key))) {
+                e.preventDefault();
+                const views = ['checklists', 'templates', 'stats', 'archive'];
+                const index = parseInt(e.key) - 1;
+                if (index >= 0 && index < views.length) {
+                    this.showView(views[index]);
+                }
+                return;
+            }
+            
+            // Enter 键在模态框中确认
+            if (e.key === 'Enter' && !document.getElementById('modal').classList.contains('hidden')) {
+                const confirmBtn = document.getElementById('modalConfirmBtn');
+                if (confirmBtn && confirmBtn.style.display !== 'none') {
+                    confirmBtn.click();
+                }
+                return;
+            }
+        });
+
+        // 添加页面卸载时的清理
+        window.addEventListener('beforeunload', () => {
+            this.cleanup();
         });
     }
 
@@ -302,18 +437,45 @@ class TodoApp {
         });
     }
 
-    showNotification(message, type = 'info') {
+    showNotification(message, type = 'info', duration = 3000) {
         const container = document.getElementById('notifications');
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
-        notification.textContent = message;
+        
+        // 添加图标
+        const icons = {
+            'info': 'ℹ️',
+            'success': '✅',
+            'warning': '⚠️',
+            'error': '❌'
+        };
+        
+        notification.innerHTML = `
+            <span class="notification-icon">${icons[type] || icons.info}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+        `;
         
         container.appendChild(notification);
         
-        // 3秒后自动移除
+        // 添加进入动画
         setTimeout(() => {
-            notification.remove();
-        }, 3000);
+            notification.classList.add('show');
+        }, 10);
+        
+        // 自动移除
+        const removeTimer = setTimeout(() => {
+            notification.classList.add('hide');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, duration);
+        
+        // 返回通知元素，允许手动控制
+        notification.removeTimer = removeTimer;
+        return notification;
     }
 
     // 创建清单相关方法将在 checklist.js 中实现

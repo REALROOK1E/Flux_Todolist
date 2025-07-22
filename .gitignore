@@ -67,6 +67,15 @@ typings/
 # Electron build output
 dist/
 out/
+build/
+
+# Electron-builder output
+*.dmg
+*.exe
+*.deb
+*.rpm
+*.AppImage
+*.snap
 
 # OS generated files
 .DS_Store

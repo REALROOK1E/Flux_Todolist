@@ -1683,6 +1683,133 @@ body {
     font-weight: 500;
 }
 
+/* ================================
+   通知系统优化
+   ================================ */
+.notifications-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 400px;
+}
+
+.notification {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    border-left: 4px solid var(--primary-500);
+}
+
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification.hide {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.notification.success {
+    border-left-color: var(--success-500);
+    background: var(--success-50);
+}
+
+.notification.warning {
+    border-left-color: var(--warning-500);
+    background: var(--warning-50);
+}
+
+.notification.error {
+    border-left-color: var(--error-500);
+    background: var(--error-50);
+}
+
+.notification-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.notification-message {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+/* ================================
+   加载指示器
+   ================================ */
+.loading-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    z-index: 10001;
+    border: 2px solid var(--primary-200);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary-500);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-indicator span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
 /* 工具类 */
 .hidden {
     display: none !important;

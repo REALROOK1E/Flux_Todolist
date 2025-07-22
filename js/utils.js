@@ -1,5 +1,66 @@
 // 实用工具函数扩展
 Object.assign(TodoApp.prototype, {
+    // 输入验证工具
+    validateInput: {
+        // 验证字符串不为空
+        notEmpty(value, fieldName = '字段') {
+            if (!value || typeof value !== 'string' || value.trim().length === 0) {
+                throw new Error(`${fieldName}不能为空`);
+            }
+            return value.trim();
+        },
+
+        // 验证数字范围
+        numberRange(value, min = 0, max = Number.MAX_SAFE_INTEGER, fieldName = '数值') {
+            const num = parseFloat(value);
+            if (isNaN(num)) {
+                throw new Error(`${fieldName}必须是有效数字`);
+            }
+            if (num < min || num > max) {
+                throw new Error(`${fieldName}必须在 ${min} 到 ${max} 之间`);
+            }
+            return num;
+        },
+
+        // 验证时长格式
+        duration(value, fieldName = '时长') {
+            const duration = this.numberRange(value, 1, 480, fieldName); // 1分钟到8小时
+            return Math.floor(duration);
+        },
+
+        // 验证清单名称
+        checklistName(value) {
+            const name = this.notEmpty(value, '清单名称');
+            if (name.length > 100) {
+                throw new Error('清单名称不能超过100个字符');
+            }
+            return name;
+        },
+
+        // 验证任务标题
+        taskTitle(value) {
+            const title = this.notEmpty(value, '任务标题');
+            if (title.length > 200) {
+                throw new Error('任务标题不能超过200个字符');
+            }
+            return title;
+        }
+    },
+
+    // 显示加载指示器
+    showLoading(message = '正在处理...') {
+        const indicator = document.getElementById('loadingIndicator');
+        const messageEl = indicator.querySelector('span');
+        messageEl.textContent = message;
+        indicator.classList.remove('hidden');
+    },
+
+    // 隐藏加载指示器
+    hideLoading() {
+        const indicator = document.getElementById('loadingIndicator');
+        indicator.classList.add('hidden');
+    },
+
     // 数据备份和恢复
     async backupData() {
         try {

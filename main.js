@@ -1,9 +1,21 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
 
-// 数据文件路径
-const DATA_FILE = path.join(__dirname, 'data.json');
+// 启用实时重载（开发环境）
+if (process.env.NODE_ENV === 'development') {
+  try {
+    require('electron-reload')(__dirname, {
+      electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
+      hardResetMethod: 'exit'
+    });
+  } catch (e) {
+    console.log('Development mode: electron-reload not available');
+  }
+}
+
+// 数据文件路径 - 使用用户数据目录
+const DATA_FILE = path.join(app.getPath('userData'), 'mytodo-data.json');
 
 let mainWindow;
 let appData = {
@@ -28,7 +40,9 @@ let appData = {
   ],
   settings: {
     theme: 'pixel',
-    autoSave: true
+    autoSave: true,
+    enableNotifications: true,
+    enableSounds: true
   }
 };
 
@@ -55,6 +69,19 @@ async function createWindow() {
   // 窗口准备好后显示
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+  });
+
+  // 处理外部链接
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  // 窗口关闭前保存数据
+  mainWindow.on('close', async (e) => {
+    e.preventDefault();
+    await saveData();
+    mainWindow.destroy();
   });
 
   // 开发模式下打开开发者工具
