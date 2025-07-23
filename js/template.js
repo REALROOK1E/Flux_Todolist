@@ -371,6 +371,12 @@ Object.assign(TodoApp.prototype, {
         const template = this.data.templates.find(t => t.id === templateId);
         const nameInput = document.getElementById('newChecklistFromTemplate');
         
+        if (!nameInput) {
+            console.error('找不到清单名称输入框');
+            this.showNotification('界面元素加载失败，请重试', 'error');
+            return;
+        }
+        
         const name = nameInput.value.trim();
         if (!name) {
             this.showNotification('请输入清单名称', 'warning');

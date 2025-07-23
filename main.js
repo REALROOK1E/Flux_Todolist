@@ -15,7 +15,23 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // 数据文件路径 - 使用用户数据目录
-const DATA_FILE = path.join(app.getPath('userData'), 'mytodo-data.json');
+const getUserDataPath = () => {
+  try {
+    const userDataPath = app.getPath('userData');
+    const dataFile = path.join(userDataPath, 'mytodo-data.json');
+    console.log('用户数据目录:', userDataPath);
+    console.log('数据文件路径:', dataFile);
+    return dataFile;
+  } catch (error) {
+    console.error('获取用户数据路径失败:', error);
+    // 备用路径
+    const fallbackPath = path.join(process.cwd(), 'user-data.json');
+    console.log('使用备用路径:', fallbackPath);
+    return fallbackPath;
+  }
+};
+
+const DATA_FILE = getUserDataPath();
 
 let mainWindow;
 let appData = {
@@ -115,15 +131,30 @@ app.on('before-quit', async () => {
 async function loadData() {
   console.log('尝试从以下路径加载数据:', DATA_FILE);
   try {
+    // 检查文件是否存在
+    await fs.access(DATA_FILE);
     const data = await fs.readFile(DATA_FILE, 'utf8');
     console.log('成功读取数据文件，大小:', data.length, '字符');
+    
+    if (data.trim() === '') {
+      console.log('数据文件为空，使用默认数据');
+      await saveData();
+      return;
+    }
+    
     const loadedData = JSON.parse(data);
     console.log('解析的数据:', loadedData);
     appData = { ...appData, ...loadedData };
     console.log('数据加载成功');
   } catch (error) {
     console.log('加载数据失败:', error.message);
-    console.log('首次运行或数据文件不存在，使用默认数据');
+    if (error.code === 'ENOENT') {
+      console.log('数据文件不存在，创建新文件');
+    } else if (error.name === 'SyntaxError') {
+      console.log('数据文件格式错误，使用默认数据');
+    } else {
+      console.log('其他错误，使用默认数据');
+    }
     await saveData(); // 创建初始数据文件
   }
 }
@@ -133,10 +164,25 @@ async function saveData() {
   try {
     console.log('正在保存数据到:', DATA_FILE);
     console.log('保存的数据:', appData);
-    await fs.writeFile(DATA_FILE, JSON.stringify(appData, null, 2));
+    
+    // 确保目录存在
+    const dirPath = path.dirname(DATA_FILE);
+    await fs.mkdir(dirPath, { recursive: true });
+    
+    // 保存数据
+    const dataString = JSON.stringify(appData, null, 2);
+    await fs.writeFile(DATA_FILE, dataString, 'utf8');
     console.log('数据保存成功');
   } catch (error) {
     console.error('保存数据失败:', error);
+    // 尝试保存到备用位置
+    try {
+      const backupFile = path.join(process.cwd(), 'mytodo-backup.json');
+      await fs.writeFile(backupFile, JSON.stringify(appData, null, 2), 'utf8');
+      console.log('数据已保存到备用位置:', backupFile);
+    } catch (backupError) {
+      console.error('备用保存也失败:', backupError);
+    }
   }
 }
 
