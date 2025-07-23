@@ -5,7 +5,8 @@ class TodoApp {
             checklists: [],
             archivedChecklists: [],
             templates: [],
-            settings: {}
+            settings: {},
+            weeklyPlan: ''
         };
         this.currentView = 'checklists';
         this.currentChecklist = null;
@@ -63,6 +64,7 @@ class TodoApp {
         if (!this.data.archivedChecklists) this.data.archivedChecklists = [];
         if (!this.data.templates) this.data.templates = [];
         if (!this.data.settings) this.data.settings = {};
+        if (!this.data.weeklyPlan) this.data.weeklyPlan = '';
 
         // 验证清单数据
         this.data.checklists = this.data.checklists.filter(checklist => {
@@ -157,6 +159,19 @@ class TodoApp {
             this.showView('archive');
         });
 
+        // 本周计划相关
+        document.getElementById('editWeeklyPlanBtn').addEventListener('click', () => {
+            this.editWeeklyPlan();
+        });
+
+        document.getElementById('saveWeeklyPlanBtn').addEventListener('click', () => {
+            this.saveWeeklyPlan();
+        });
+
+        document.getElementById('cancelWeeklyPlanBtn').addEventListener('click', () => {
+            this.cancelWeeklyPlanEdit();
+        });
+
         // 返回按钮
         document.getElementById('backBtn').addEventListener('click', () => {
             this.showView('checklists');
@@ -194,8 +209,14 @@ class TodoApp {
             // Ctrl+S 保存数据
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
-                this.saveData();
-                this.showNotification('数据已保存', 'success');
+                // 如果正在编辑本周计划，保存本周计划
+                const weeklyPlanEdit = document.getElementById('weeklyPlanEdit');
+                if (weeklyPlanEdit && !weeklyPlanEdit.classList.contains('hidden')) {
+                    this.saveWeeklyPlan();
+                } else {
+                    this.saveData();
+                    this.showNotification('数据已保存', 'success');
+                }
                 return;
             }
             
@@ -207,6 +228,13 @@ class TodoApp {
                 } else if (this.currentView === 'templates') {
                     this.showCreateTemplateModal();
                 }
+                return;
+            }
+            
+            // Ctrl+E 编辑本周计划 (仅在清单视图下)
+            if (e.ctrlKey && e.key === 'e' && this.currentView === 'checklists') {
+                e.preventDefault();
+                this.editWeeklyPlan();
                 return;
             }
             
@@ -278,6 +306,9 @@ class TodoApp {
     }
 
     renderChecklistsView() {
+        // 渲染本周计划
+        this.renderWeeklyPlan();
+        
         const container = document.getElementById('checklistsList');
         const emptyState = document.getElementById('emptyState');
 
@@ -609,6 +640,69 @@ class TodoApp {
             console.error('删除清单失败:', error);
             this.showNotification('删除清单失败', 'error');
         }
+    }
+
+    // 本周计划相关方法
+    renderWeeklyPlan() {
+        const displayElement = document.getElementById('weeklyPlanDisplay');
+        const plan = this.data.weeklyPlan || '';
+        
+        if (plan.trim()) {
+            displayElement.textContent = plan;
+            displayElement.classList.remove('empty');
+        } else {
+            displayElement.textContent = '点击编辑按钮添加本周计划...';
+            displayElement.classList.add('empty');
+        }
+    }
+
+    editWeeklyPlan() {
+        const displayElement = document.getElementById('weeklyPlanDisplay');
+        const editElement = document.getElementById('weeklyPlanEdit');
+        const textarea = document.getElementById('weeklyPlanTextarea');
+        
+        // 显示编辑界面
+        displayElement.classList.add('hidden');
+        editElement.classList.remove('hidden');
+        
+        // 设置当前内容
+        textarea.value = this.data.weeklyPlan || '';
+        
+        // 聚焦到文本区域
+        setTimeout(() => {
+            textarea.focus();
+        }, 100);
+    }
+
+    async saveWeeklyPlan() {
+        const textarea = document.getElementById('weeklyPlanTextarea');
+        const newPlan = textarea.value.trim();
+        
+        try {
+            // 保存到数据
+            this.data.weeklyPlan = newPlan;
+            await this.saveData();
+            
+            // 隐藏编辑界面，显示内容
+            this.cancelWeeklyPlanEdit();
+            
+            // 重新渲染
+            this.renderWeeklyPlan();
+            
+            this.showNotification('本周计划已保存', 'success');
+        } catch (error) {
+            console.error('保存本周计划失败:', error);
+            this.showNotification('保存失败', 'error');
+        }
+    }
+
+    cancelWeeklyPlanEdit() {
+        const displayElement = document.getElementById('weeklyPlanDisplay');
+        const editElement = document.getElementById('weeklyPlanEdit');
+        
+        // 隐藏编辑界面，显示内容
+        editElement.classList.add('hidden');
+        displayElement.classList.remove('hidden');
     }
 }
 

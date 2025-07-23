@@ -1850,3 +1850,154 @@ body {
 .p-20 {
     padding: 20px;
 }
+
+/* 本周计划样式 */
+.weekly-plan-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.weekly-plan-section:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+}
+
+.weekly-plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.weekly-plan-title {
+    color: var(--gray-800);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.weekly-plan-content {
+    position: relative;
+}
+
+.weekly-plan-display {
+    min-height: 80px;
+    padding: 16px;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.weekly-plan-display:hover {
+    border-color: var(--primary-300);
+}
+
+.weekly-plan-display.empty {
+    color: var(--gray-400);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.weekly-plan-edit {
+    background: white;
+    border: 2px solid var(--primary-200);
+    border-radius: 8px;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.weekly-plan-textarea {
+    width: 100%;
+    min-height: 120px;
+    margin-bottom: 12px;
+    border: 2px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+    transition: all 0.2s ease;
+    background: #fafafa;
+}
+
+.weekly-plan-textarea:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: white;
+}
+
+.weekly-plan-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-height: 36px;
+    font-weight: 500;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .weekly-plan-section {
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .weekly-plan-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .weekly-plan-title {
+        font-size: 1.1rem;
+    }
+    
+    .weekly-plan-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .weekly-plan-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .weekly-plan-display {
+        min-height: 60px;
+        padding: 12px;
+        font-size: 13px;
+    }
+    
+    .weekly-plan-textarea {
+        min-height: 100px;
+        font-size: 13px;
+    }
+}

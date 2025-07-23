@@ -34,6 +34,29 @@
         <main class="main-content">
             <!-- 清单列表视图 -->
             <div id="checklistsView" class="view active">
+                <!-- 本周计划区域 -->
+                <div class="weekly-plan-section">
+                    <div class="weekly-plan-header">
+                        <h2 class="weekly-plan-title">📅 本周计划</h2>
+                        <button id="editWeeklyPlanBtn" class="btn btn-secondary pixel-btn btn-sm" title="编辑本周计划">
+                            ✏
+                        </button>
+                    </div>
+                    <div class="weekly-plan-content">
+                        <div id="weeklyPlanDisplay" class="weekly-plan-display">
+                            <!-- 本周计划内容将在这里显示 -->
+                        </div>
+                        <div id="weeklyPlanEdit" class="weekly-plan-edit hidden">
+                            <textarea id="weeklyPlanTextarea" class="pixel-input weekly-plan-textarea" 
+                                     placeholder="输入你的本周计划...&#10;例如：&#10;• 完成项目设计文档&#10;• 学习新技术&#10;• 运动3次"></textarea>
+                            <div class="weekly-plan-actions">
+                                <button id="saveWeeklyPlanBtn" class="btn btn-primary pixel-btn btn-sm">保存</button>
+                                <button id="cancelWeeklyPlanBtn" class="btn btn-secondary pixel-btn btn-sm">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="checklists-container">
                     <div id="checklistsList" class="checklists-grid">
                         <!-- 清单卡片将在这里动态生成 -->

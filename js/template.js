@@ -29,7 +29,15 @@ Object.assign(TodoApp.prototype, {
                 </div>
                 ${template.description ? `<p style="color: #9ca3af; margin: 8px 0; font-size: 14px;">${template.description}</p>` : ''}
                 <ul class="template-tasks">
-                    ${template.tasks.map(task => `<li>${task}</li>`).join('')}
+                    ${template.tasks.map(task => {
+                        if (typeof task === 'object' && task !== null) {
+                            // 新格式：显示任务标题和时长
+                            return `<li>${task.title} (${task.duration}分钟, ${task.type === 'timer' ? '正计时' : '倒计时'})</li>`;
+                        } else {
+                            // 旧格式：直接显示字符串
+                            return `<li>${task}</li>`;
+                        }
+                    }).join('')}
                 </ul>
                 <div class="template-meta" style="margin-top: 15px; font-size: 12px; color: #666;">
                     ${template.tasks.length} 个任务
@@ -188,7 +196,7 @@ Object.assign(TodoApp.prototype, {
             this.data.templates.push(newTemplate);
             await this.saveData();
             this.hideModal();
-            this.renderTemplatesList();
+            this.renderTemplatesView();
             this.showNotification(`模板"${name}"创建成功`);
         } catch (error) {
             console.error('创建模板失败:', error);
@@ -328,7 +336,13 @@ Object.assign(TodoApp.prototype, {
                 <h4 style="color: #00ff00; margin-bottom: 10px;">模板: ${template.name}</h4>
                 <div style="background: #1a1a1a; border: 2px solid #444; border-radius: 4px; padding: 15px;">
                     <strong>包含任务:</strong><br>
-                    ${template.tasks.map(task => `• ${task}`).join('<br>')}
+                    ${template.tasks.map(task => {
+                        if (typeof task === 'object' && task !== null) {
+                            return `• ${task.title} (${task.duration}分钟, ${task.type === 'timer' ? '正计时' : '倒计时'})`;
+                        } else {
+                            return `• ${task}`;
+                        }
+                    }).join('<br>')}
                 </div>
             </div>
             <div class="form-group">
@@ -368,15 +382,27 @@ Object.assign(TodoApp.prototype, {
             // 构建新清单对象
             const newChecklist = {
                 name: name,
-                tasks: template.tasks.map((taskName, index) => {
-                    // 解析任务名称中的时间信息
-                    const timeMatch = taskName.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*分钟\)$/);
-                    let title = taskName;
-                    let duration = 1800; // 默认30分钟
+                tasks: template.tasks.map((task, index) => {
+                    // 现在模板任务是对象，包含 title, duration, type 等属性
+                    let title, duration, type;
+                    
+                    if (typeof task === 'object' && task !== null) {
+                        // 新的模板格式（对象）
+                        title = task.title || '新任务';
+                        duration = (task.duration || 30) * 60; // 转换为秒
+                        type = task.type || 'timer';
+                    } else {
+                        // 旧的模板格式（字符串），向后兼容
+                        const taskName = String(task);
+                        const timeMatch = taskName.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*分钟\)$/);
+                        title = taskName;
+                        duration = 1800; // 默认30分钟
+                        type = 'timer';
 
-                    if (timeMatch) {
-                        title = timeMatch[1].trim();
-                        duration = parseFloat(timeMatch[2]) * 60; // 转换为秒
+                        if (timeMatch) {
+                            title = timeMatch[1].trim();
+                            duration = parseFloat(timeMatch[2]) * 60; // 转换为秒
+                        }
                     }
 
                     return {
@@ -384,7 +410,7 @@ Object.assign(TodoApp.prototype, {
                         title: title,
                         completed: false,
                         duration: duration,
-                        type: 'timer', // 默认正计时
+                        type: type,
                         spentTime: 0,
                         isRunning: false,
                         createdAt: new Date().toISOString()
