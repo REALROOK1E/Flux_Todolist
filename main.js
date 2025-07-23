@@ -113,12 +113,16 @@ app.on('before-quit', async () => {
 
 // 加载数据
 async function loadData() {
+  console.log('尝试从以下路径加载数据:', DATA_FILE);
   try {
     const data = await fs.readFile(DATA_FILE, 'utf8');
+    console.log('成功读取数据文件，大小:', data.length, '字符');
     const loadedData = JSON.parse(data);
+    console.log('解析的数据:', loadedData);
     appData = { ...appData, ...loadedData };
     console.log('数据加载成功');
   } catch (error) {
+    console.log('加载数据失败:', error.message);
     console.log('首次运行或数据文件不存在，使用默认数据');
     await saveData(); // 创建初始数据文件
   }
@@ -127,6 +131,8 @@ async function loadData() {
 // 保存数据
 async function saveData() {
   try {
+    console.log('正在保存数据到:', DATA_FILE);
+    console.log('保存的数据:', appData);
     await fs.writeFile(DATA_FILE, JSON.stringify(appData, null, 2));
     console.log('数据保存成功');
   } catch (error) {
