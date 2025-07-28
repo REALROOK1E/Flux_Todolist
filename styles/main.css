@@ -2001,3 +2001,32 @@ body {
         font-size: 13px;
     }
 }
+
+/* ================================
+   归档任务详情样式
+   ================================ */
+
+.archived-tasks {
+    margin-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 10px;
+}
+
+.archived-task {
+    transition: all 0.2s ease;
+}
+
+.archived-task:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.archived-task.completed {
+    background-color: #f0f9ff !important;
+    border-left-color: #10b981 !important;
+}
+
+.archived-task:not(.completed) {
+    background-color: #fef2f2 !important;
+    border-left-color: #ef4444 !important;
+}

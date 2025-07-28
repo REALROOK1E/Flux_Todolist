@@ -418,9 +418,11 @@ class TodoApp {
     }
 
     formatTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
+        // 确保 seconds 是整数
+        const totalSeconds = Math.round(seconds);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
@@ -536,20 +538,8 @@ class TodoApp {
             totalWorkTime += this.calculateSpentTime(checklist.tasks);
         });
 
-        // 计算平均每日工作时间（基于最近30天）
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const recentChecklists = completedChecklists.filter(checklist => 
-            new Date(checklist.finishedAt || checklist.createdAt) >= thirtyDaysAgo
-        );
-        
-        let recentWorkTime = 0;
-        recentChecklists.forEach(checklist => {
-            recentWorkTime += this.calculateSpentTime(checklist.tasks);
-        });
-        
-        const averageWorkTime = recentWorkTime / 30; // 30天平均
+        // 计算平均清单工作时间（取整到秒）
+        const averageWorkTime = allChecklists.length > 0 ? Math.round(totalWorkTime / allChecklists.length) : 0;
 
         // 更新统计数值
         document.getElementById('totalChecklists').textContent = allChecklists.length;

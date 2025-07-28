@@ -157,6 +157,21 @@ Object.assign(TodoApp.prototype, {
                 this.addTask();
             }
         };
+
+        // 设置计时类型变化事件
+        const taskTypeSelect = document.getElementById('taskTypeSelect');
+        const durationField = document.getElementById('durationField');
+        
+        const toggleDurationField = () => {
+            if (taskTypeSelect.value === 'timer') {
+                durationField.style.display = 'none';
+            } else {
+                durationField.style.display = 'block';
+            }
+        };
+        
+        taskTypeSelect.addEventListener('change', toggleDurationField);
+        toggleDurationField(); // 初始化显示状态
     },
 
     updateChecklistStats() {
@@ -164,13 +179,11 @@ Object.assign(TodoApp.prototype, {
 
         const completedTasks = this.currentChecklist.tasks.filter(task => task.completed).length;
         const totalTasks = this.currentChecklist.tasks.length;
-        const totalTime = this.calculateTotalTime(this.currentChecklist.tasks);
         const spentTime = this.calculateSpentTime(this.currentChecklist.tasks);
-        const remainingTime = Math.max(0, totalTime - spentTime);
 
         document.getElementById('completedTasks').textContent = `已完成: ${completedTasks}/${totalTasks}`;
-        document.getElementById('totalTime').textContent = `总时长: ${this.formatTime(totalTime)}`;
-        document.getElementById('remainingTime').textContent = `剩余: ${this.formatTime(remainingTime)}`;
+        document.getElementById('totalTime').textContent = `已工作: ${this.formatTime(spentTime)}`;
+        document.getElementById('remainingTime').textContent = `任务进度: ${totalTasks > 0 ? Math.round((completedTasks/totalTasks)*100) : 0}%`;
     },
 
     renderTasksList() {
@@ -208,7 +221,7 @@ Object.assign(TodoApp.prototype, {
                         <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
                         <div class="task-meta">
                             <span>类型: ${task.type === 'timer' ? '正计时' : '倒计时'}</span>
-                            <span>预计: ${this.formatTime(task.duration)}</span>
+                            ${task.type === 'countdown' ? `<span>预计: ${this.formatTime(task.duration)}</span>` : ''}
                             <span>已用: ${this.formatTime(task.spentTime)}</span>
                             ${totalSubtasks > 0 ? `<span>子任务: ${completedSubtasks}/${totalSubtasks}</span>` : ''}
                         </div>
@@ -284,8 +297,8 @@ Object.assign(TodoApp.prototype, {
         const typeSelect = document.getElementById('taskTypeSelect');
 
         const title = titleInput.value.trim();
-        const duration = parseInt(durationInput.value) || 30; // 默认30分钟
         const type = typeSelect.value;
+        const duration = type === 'timer' ? 0 : (parseInt(durationInput.value) || 30); // 正计时任务无预期时间
 
         if (!title) {
             this.showNotification('请输入任务标题', 'warning');
@@ -297,7 +310,7 @@ Object.assign(TodoApp.prototype, {
             id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             title: title,
             completed: false,
-            duration: duration * 60, // 转换为秒
+            duration: type === 'timer' ? 0 : duration * 60, // 正计时任务duration为0
             type: type,
             spentTime: 0,
             isRunning: false,
@@ -309,7 +322,9 @@ Object.assign(TodoApp.prototype, {
         
         // 清空输入框
         titleInput.value = '';
-        durationInput.value = '';
+        if (type === 'countdown') {
+            durationInput.value = '';
+        }
         typeSelect.value = 'timer';
 
         // 保存并重新渲染

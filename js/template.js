@@ -119,9 +119,10 @@ Object.assign(TodoApp.prototype, {
                        class="pixel-input" style="flex: 1; margin: 0; min-height: 36px;">
                 <input type="number" value="${task.duration}" min="1"
                        onchange="app.updateTemplateTask(${index}, 'duration', this.value)"
-                       class="pixel-input" style="width: 80px; margin: 0; min-height: 36px;">
+                       class="pixel-input template-duration-${index}" 
+                       style="width: 80px; margin: 0; min-height: 36px; ${task.type === 'timer' ? 'display: none;' : ''}">
                 <select onchange="app.updateTemplateTask(${index}, 'type', this.value)"
-                        class="pixel-select" style="width: 100px; margin: 0; min-height: 36px;">
+                        class="pixel-select template-type-${index}" style="width: 100px; margin: 0; min-height: 36px;">
                     <option value="timer" ${task.type === 'timer' ? 'selected' : ''}>正计时</option>
                     <option value="countdown" ${task.type === 'countdown' ? 'selected' : ''}>倒计时</option>
                 </select>
@@ -134,7 +135,7 @@ Object.assign(TodoApp.prototype, {
     addTemplateTask() {
         this.templateTasks.push({
             title: '新任务',
-            duration: 30,
+            duration: 0, // 正计时任务默认无预期时间
             type: 'timer'
         });
         this.renderTemplateTasksList();
@@ -146,6 +147,15 @@ Object.assign(TodoApp.prototype, {
                 this.templateTasks[index][field] = parseInt(value) || 30;
             } else {
                 this.templateTasks[index][field] = value;
+                // 如果改变了类型，重新渲染以更新时长输入框的显示状态
+                if (field === 'type') {
+                    if (value === 'timer') {
+                        this.templateTasks[index].duration = 0; // 正计时任务duration为0
+                    } else if (this.templateTasks[index].duration === 0) {
+                        this.templateTasks[index].duration = 30; // 倒计时任务默认30分钟
+                    }
+                    this.renderTemplateTasksList();
+                }
             }
         }
     },
@@ -552,6 +562,16 @@ Object.assign(TodoApp.prototype, {
                 const totalTime = this.calculateTotalTime(checklist.tasks);
                 const spentTime = this.calculateSpentTime(checklist.tasks);
 
+                // 计算所有子任务统计
+                const allSubtasks = checklist.tasks.reduce((acc, task) => {
+                    if (task.subtasks && task.subtasks.length > 0) {
+                        acc.push(...task.subtasks);
+                    }
+                    return acc;
+                }, []);
+                const completedSubtasks = allSubtasks.filter(st => st.completed).length;
+                const totalSubtasks = allSubtasks.length;
+
                 return `
                     <div class="archived-item">
                         <div class="archived-header">
@@ -561,10 +581,45 @@ Object.assign(TodoApp.prototype, {
                             </span>
                         </div>
                         <div class="archived-stats">
-                            <span>完成度: ${completedTasks}/${totalTasks} (${Math.round((completedTasks/totalTasks)*100)}%)</span>
-                            <span>预计时长: ${this.formatTime(totalTime)}</span>
-                            <span>实际用时: ${this.formatTime(spentTime)}</span>
-                            <span>效率: ${totalTime > 0 ? Math.round((totalTime/spentTime)*100) : 0}%</span>
+                            <span>任务完成: ${completedTasks}/${totalTasks} (${totalTasks > 0 ? Math.round((completedTasks/totalTasks)*100) : 0}%)</span>
+                            <span>已工作: ${this.formatTime(spentTime)}</span>
+                            ${totalSubtasks > 0 ? `<span>子任务: ${completedSubtasks}/${totalSubtasks}</span>` : ''}
+                        </div>
+                        <div class="archived-tasks">
+                            <h4 style="margin: 10px 0 5px 0; color: #666; font-size: 14px;">任务详情:</h4>
+                            ${checklist.tasks.map(task => {
+                                const taskCompletedSubtasks = task.subtasks ? task.subtasks.filter(st => st.completed).length : 0;
+                                const taskTotalSubtasks = task.subtasks ? task.subtasks.length : 0;
+                                
+                                return `
+                                    <div class="archived-task ${task.completed ? 'completed' : ''}" style="
+                                        margin: 5px 0; 
+                                        padding: 8px; 
+                                        background: ${task.completed ? '#f0f9ff' : '#fef2f2'}; 
+                                        border-left: 3px solid ${task.completed ? '#10b981' : '#ef4444'}; 
+                                        border-radius: 4px;
+                                        font-size: 13px;
+                                    ">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 500; ${task.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${task.completed ? '✓' : '✗'} ${task.title}</span>
+                                            <div style="font-size: 11px; color: #666;">
+                                                <span>${task.type === 'timer' ? '正计时' : '倒计时'}</span>
+                                                | 工作时长: ${this.formatTime(task.spentTime)}
+                                            </div>
+                                        </div>
+                                        ${taskTotalSubtasks > 0 ? `
+                                            <div style="margin-top: 5px; padding-left: 15px;">
+                                                <div style="font-size: 11px; color: #888; margin-bottom: 3px;">子任务 (${taskCompletedSubtasks}/${taskTotalSubtasks}):</div>
+                                                ${task.subtasks.map(subtask => `
+                                                    <div style="margin: 2px 0; font-size: 11px; ${subtask.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">
+                                                        ${subtask.completed ? '✓' : '✗'} ${subtask.text}
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
