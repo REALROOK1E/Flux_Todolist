@@ -1,6 +1,25 @@
 # MyTodo - 像素风格 Electron 清单应用
 
+[![Version](https://img.shields.io/badge/version-1.2.1-blue.svg)](https://github.com/REALROOK1E/Mytodo/releases/tag/v1.2.1)
+[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)]()
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 一个具有像素游戏风格的本地待办事项管理应用，支持正/倒计时、模板管理和数据归档功能。
+
+## 📥 下载安装
+
+### 最新版本 v1.2.1 (2025-01-29)
+
+- **便携版**: [MyTodo 1.2.1.exe](https://github.com/REALROOK1E/Mytodo/releases/download/v1.2.1/MyTodo%201.2.1.exe) - 无需安装，直接运行
+- **安装版**: [MyTodo Setup 1.2.1.exe](https://github.com/REALROOK1E/Mytodo/releases/download/v1.2.1/MyTodo%20Setup%201.2.1.exe) - 完整安装包
+
+### 版本更新 🆕
+- ✨ 优化时间计算精度，统计时间精确到秒
+- 🔧 使用 Math.round() 处理所有时间显示
+- 📊 提升平均清单工作时间计算精度
+- 🐛 修复小数点精度问题
+
+[查看完整更新日志](CHANGELOG_v1.2.1.md)
 
 ## 功能特性
 
@@ -135,10 +154,11 @@ mytodo/
 
 ## 技术栈
 
-- **框架**: Electron
-- **前端**: HTML5 + CSS3 + Vanilla JavaScript
-- **数据存储**: JSON 文件
-- **构建工具**: electron-builder
+- **框架**: Electron 28.3.3
+- **前端**: HTML5 + CSS3 + Vanilla JavaScript (ES6+)
+- **数据存储**: JSON 文件本地存储
+- **构建工具**: electron-builder 24.13.3
+- **版本**: v1.2.1
 
 ## 开发计划
 
