@@ -41,6 +41,7 @@ Object.assign(TodoApp.prototype, {
                 </ul>
                 <div class="template-meta" style="margin-top: 15px; font-size: 12px; color: #666;">
                     ${template.tasks.length} 个任务
+                    ${template.expectedWorkTime ? ` · 预期 ${template.expectedWorkTime} 小时` : ''}
                 </div>
             </div>
         `).join('');
@@ -61,6 +62,13 @@ Object.assign(TodoApp.prototype, {
                 <label for="templateDescription">模板简述:</label>
                 <textarea id="templateDescription" class="pixel-input" 
                          style="width: 100%; margin-top: 10px; height: 80px; resize: vertical;"></textarea>
+            </div>
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="templateExpectedWorkTime">预期工作时间 (小时):</label>
+                <input type="number" id="templateExpectedWorkTime" class="pixel-input" min="0.5" step="0.5" placeholder="如: 8" style="width: 100%; margin-top: 10px;">
+                <small style="color: #aaa; margin-top: 5px; display: block;">
+                    设置使用此模板创建清单时的默认预期工作时间
+                </small>
             </div>
             <div class="form-group" style="margin-top: 20px;">
                 <label>任务列表:</label>
@@ -168,9 +176,11 @@ Object.assign(TodoApp.prototype, {
     async createTemplate() {
         const nameInput = document.getElementById('templateName');
         const descriptionInput = document.getElementById('templateDescription');
+        const expectedWorkTimeInput = document.getElementById('templateExpectedWorkTime');
         
         const name = nameInput.value.trim();
         const description = descriptionInput.value.trim();
+        const expectedWorkTime = parseFloat(expectedWorkTimeInput.value) || 0;
 
         if (!name) {
             this.showNotification('请输入模板名称', 'warning');
@@ -194,6 +204,7 @@ Object.assign(TodoApp.prototype, {
             id: `template_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             name: name,
             description: description,
+            expectedWorkTime: expectedWorkTime, // 添加预期工作时间（小时）
             tasks: validTasks.map(task => ({
                 title: task.title.trim(),
                 duration: parseInt(task.duration) || 30,
@@ -236,13 +247,46 @@ Object.assign(TodoApp.prototype, {
                          style="width: 100%; margin-top: 10px; height: 80px; resize: vertical;">${template.description || ''}</textarea>
             </div>
             <div class="form-group" style="margin-top: 20px;">
-                <label for="editTemplateTasks">任务列表 (每行一个任务):</label>
-                <textarea id="editTemplateTasks" class="pixel-input" 
-                          style="width: 100%; margin-top: 10px; height: 150px; resize: vertical; font-family: 'Courier New', monospace;">${template.tasks.join('\n')}</textarea>
+                <label for="editTemplateExpectedWorkTime">预期工作时间 (小时):</label>
+                <input type="number" id="editTemplateExpectedWorkTime" class="pixel-input" min="0.5" step="0.5" 
+                       value="${template.expectedWorkTime || ''}" style="width: 100%; margin-top: 10px;">
+            </div>
+            <div class="form-group" style="margin-top: 20px;">
+                <label>任务列表:</label>
+                <div id="editTemplateTasksList" style="margin-top: 10px;">
+                    <!-- 任务列表将在这里动态生成 -->
+                </div>
+                <button type="button" id="addEditTemplateTaskBtn" class="btn btn-primary" style="margin-top: 10px; width: auto; padding: 8px 16px;">
+                    ✚ 添加任务
+                </button>
             </div>
         `;
 
         this.showModal('编辑模板', modalBody);
+
+        // 初始化任务列表
+        this.editingTemplateTasks = template.tasks.map(task => {
+            if (typeof task === 'object' && task !== null) {
+                return {
+                    title: task.title || task.toString(),
+                    duration: task.duration || 30,
+                    type: task.type || 'timer'
+                };
+            } else {
+                return {
+                    title: task.toString(),
+                    duration: 30,
+                    type: 'timer'
+                };
+            }
+        });
+        
+        this.renderEditTemplateTasksList();
+
+        // 设置添加任务按钮事件
+        document.getElementById('addEditTemplateTaskBtn').addEventListener('click', () => {
+            this.addEditTemplateTask();
+        });
 
         // 设置确认按钮事件
         const confirmBtn = document.getElementById('modalConfirmBtn');
@@ -254,14 +298,79 @@ Object.assign(TodoApp.prototype, {
         }, 100);
     },
 
+    renderEditTemplateTasksList() {
+        const container = document.getElementById('editTemplateTasksList');
+        if (!container) return;
+
+        container.innerHTML = this.editingTemplateTasks.map((task, index) => `
+            <div class="template-task-item" style="
+                display: flex; 
+                align-items: center; 
+                gap: 10px; 
+                padding: 10px; 
+                background: #f8fafc; 
+                border: 1px solid #e2e8f0; 
+                border-radius: 8px; 
+                margin-bottom: 8px;
+            ">
+                <input type="text" value="${task.title}" 
+                       onchange="app.updateEditTemplateTask(${index}, 'title', this.value)"
+                       class="pixel-input" style="flex: 1; margin: 0; min-height: 36px;">
+                <input type="number" value="${task.duration}" min="1"
+                       onchange="app.updateEditTemplateTask(${index}, 'duration', this.value)"
+                       class="pixel-input edit-template-duration-${index}" 
+                       style="width: 80px; margin: 0; min-height: 36px; ${task.type === 'timer' ? 'display: none;' : ''}">
+                <select onchange="app.updateEditTemplateTask(${index}, 'type', this.value)"
+                        class="pixel-select edit-template-type-${index}" style="width: 100px; margin: 0; min-height: 36px;">
+                    <option value="timer" ${task.type === 'timer' ? 'selected' : ''}>正计时</option>
+                    <option value="countdown" ${task.type === 'countdown' ? 'selected' : ''}>倒计时</option>
+                </select>
+                <button type="button" onclick="app.removeEditTemplateTask(${index})" 
+                        class="pixel-btn btn-danger btn-sm" title="删除任务">🗑</button>
+            </div>
+        `).join('');
+    },
+
+    addEditTemplateTask() {
+        this.editingTemplateTasks.push({
+            title: '新任务',
+            duration: 0,
+            type: 'timer'
+        });
+        this.renderEditTemplateTasksList();
+    },
+
+    updateEditTemplateTask(index, field, value) {
+        if (this.editingTemplateTasks[index]) {
+            if (field === 'duration') {
+                this.editingTemplateTasks[index][field] = parseInt(value) || 30;
+            } else {
+                this.editingTemplateTasks[index][field] = value;
+                if (field === 'type') {
+                    if (value === 'timer') {
+                        this.editingTemplateTasks[index].duration = 0;
+                    } else if (this.editingTemplateTasks[index].duration === 0) {
+                        this.editingTemplateTasks[index].duration = 30;
+                    }
+                    this.renderEditTemplateTasksList();
+                }
+            }
+        }
+    },
+
+    removeEditTemplateTask(index) {
+        this.editingTemplateTasks.splice(index, 1);
+        this.renderEditTemplateTasksList();
+    },
+
     async saveTemplateEdit(templateId) {
         const nameInput = document.getElementById('editTemplateName');
         const descriptionInput = document.getElementById('editTemplateDescription');
-        const tasksInput = document.getElementById('editTemplateTasks');
+        const expectedWorkTimeInput = document.getElementById('editTemplateExpectedWorkTime');
         
         const name = nameInput.value.trim();
         const description = descriptionInput.value.trim();
-        const tasksText = tasksInput.value.trim();
+        const expectedWorkTime = parseFloat(expectedWorkTimeInput.value) || 0;
 
         if (!name) {
             this.showNotification('请输入模板名称', 'warning');
@@ -269,20 +378,15 @@ Object.assign(TodoApp.prototype, {
             return;
         }
 
-        if (!tasksText) {
-            this.showNotification('请输入至少一个任务', 'warning');
-            tasksInput.focus();
+        if (!this.editingTemplateTasks || this.editingTemplateTasks.length === 0) {
+            this.showNotification('请至少添加一个任务', 'warning');
             return;
         }
 
-        // 解析任务列表
-        const tasks = tasksText.split('\n')
-            .map(line => line.trim())
-            .filter(line => line.length > 0);
-
-        if (tasks.length === 0) {
-            this.showNotification('请输入至少一个任务', 'warning');
-            tasksInput.focus();
+        // 验证任务数据
+        const validTasks = this.editingTemplateTasks.filter(task => task.title.trim());
+        if (validTasks.length === 0) {
+            this.showNotification('请确保所有任务都有标题', 'warning');
             return;
         }
 
@@ -290,11 +394,16 @@ Object.assign(TodoApp.prototype, {
             const template = this.data.templates.find(t => t.id === templateId);
             template.name = name;
             template.description = description;
-            template.tasks = tasks;
+            template.expectedWorkTime = expectedWorkTime;
+            template.tasks = validTasks.map(task => ({
+                title: task.title.trim(),
+                duration: parseInt(task.duration) || 30,
+                type: task.type || 'timer'
+            }));
             template.updatedAt = new Date().toISOString();
 
             // 保存到数据库
-            await window.electronAPI.saveTemplate(template);
+            await this.saveData();
             
             this.hideModal();
             this.showNotification('模板更新成功', 'success');

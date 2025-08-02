@@ -1,0 +1,390 @@
+/* 悬浮窗样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background: transparent;
+    overflow: hidden;
+    user-select: none;
+    -webkit-app-region: no-drag; /* 默认不可拖拽 */
+}
+
+.floating-container {
+    width: 100%;
+    height: 100%;
+    min-height: 180px; /* 确保容器有足够高度显示所有内容 */
+    display: flex;
+    flex-direction: column;
+    background: rgba(37, 99, 235, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* 主悬浮窗 */
+.main-float {
+    padding: 12px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    -webkit-app-region: drag; /* 头部可拖拽 */
+    cursor: move;
+    transition: all 0.2s ease;
+}
+
+.main-float:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-1px);
+}
+
+.float-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    -webkit-app-region: drag; /* 头部可拖拽 */
+}
+
+.checklist-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -webkit-app-region: drag; /* 清单名可拖拽 */
+}
+
+.toggle-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    -webkit-app-region: no-drag; /* 按钮不可拖拽 */
+}
+
+.toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.work-time {
+    text-align: center;
+    -webkit-app-region: drag; /* 时间区域可拖拽 */
+}
+
+.time-display {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #fff;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.time-label {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.5px;
+}
+
+/* 任务列表 */
+.tasks-list {
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    max-height: 300px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    -webkit-app-region: no-drag;
+}
+
+.tasks-list.hidden {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tasks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(37, 99, 235, 0.1);
+    border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.tasks-header h3 {
+    font-size: 12px;
+    color: #374151;
+    font-weight: 600;
+}
+
+.refresh-btn {
+    background: none;
+    border: none;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    transition: background 0.2s ease;
+}
+
+.refresh-btn:hover {
+    background: rgba(37, 99, 235, 0.1);
+}
+
+.tasks-content {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+/* 任务项 */
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+    transition: background 0.2s ease;
+}
+
+.task-item:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-checkbox {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.task-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-title {
+    font-size: 11px;
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-meta {
+    font-size: 9px;
+    color: #6b7280;
+    display: flex;
+    gap: 8px;
+}
+
+.task-type {
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 8px;
+    font-weight: 500;
+}
+
+.task-type.timer {
+    background: #ddd6fe;
+    color: #7c3aed;
+}
+
+.task-type.countdown {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.task-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+}
+
+.task-timer-btn {
+    background: #10b981;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.task-timer-btn:hover {
+    background: #059669;
+    transform: scale(1.05);
+}
+
+.task-timer-btn.running {
+    background: #ef4444;
+}
+
+.task-timer-btn.running:hover {
+    background: #dc2626;
+}
+
+.task-timer-btn.paused {
+    background: #f59e0b;
+}
+
+.task-timer-btn.paused:hover {
+    background: #d97706;
+}
+
+/* 控制按钮 */
+.controls {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+}
+
+.control-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* 空状态 */
+.empty-tasks {
+    padding: 20px 12px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.empty-tasks .empty-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+/* 滚动条样式 */
+.tasks-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tasks-content::-webkit-scrollbar-track {
+    background: rgba(229, 231, 235, 0.3);
+}
+
+.tasks-content::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 2px;
+}
+
+.tasks-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.7);
+}
+
+/* 悬浮窗进度条样式 */
+.floating-progress {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.floating-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.floating-progress-fill {
+    height: 100%;
+    background: #10b981 !important;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    width: 0%;
+}
+
+.floating-progress-fill.over-100 {
+    background: #f59e0b !important;
+}
+
+.floating-progress-fill.complete {
+    background: #8b5cf6 !important;
+}
+
+.floating-progress-text {
+    font-size: 8px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    min-width: 25px;
+    text-align: right;
+}
+
+/* 动画 */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.running .time-display {
+    animation: pulse 1s infinite;
+}
+
+/* 响应式 */
+@media (max-width: 200px) {
+    .floating-container {
+        border-radius: 8px;
+    }
+    
+    .main-float {
+        padding: 8px;
+    }
+    
+    .time-display {
+        font-size: 14px;
+    }
+    
+    .task-item {
+        padding: 6px 8px;
+    }
+}

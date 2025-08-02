@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTodo 悬浮窗</title>
+    <link rel="stylesheet" href="styles/floating.css">
+</head>
+<body>
+    <div id="floatingApp" class="floating-container">
+        <!-- 主悬浮窗 - 显示当前工作时间 -->
+        <div id="mainFloat" class="main-float">
+            <div class="float-header">
+                <span id="currentChecklistName" class="checklist-name">无活动清单</span>
+                <button id="toggleTasks" class="toggle-btn" title="展开/收起任务">📋</button>
+            </div>
+            <div class="work-time">
+                <span id="totalWorkTime" class="time-display">00:00:00</span>
+                <span class="time-label">总工作时间</span>
+                <div class="floating-progress" id="floatingProgress" style="display: none;">
+                    <div class="floating-progress-bar">
+                        <div class="floating-progress-fill" id="floatingProgressFill"></div>
+                    </div>
+                    <span class="floating-progress-text" id="floatingProgressText">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 任务列表 - 可展开/收起 -->
+        <div id="tasksList" class="tasks-list hidden">
+            <div class="tasks-header">
+                <h3>当前任务</h3>
+                <button id="refreshTasks" class="refresh-btn" title="刷新">🔄</button>
+            </div>
+            <div id="tasksContent" class="tasks-content">
+                <!-- 任务项将在这里动态生成 -->
+            </div>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="controls">
+            <button id="openMainApp" class="control-btn" title="打开主应用">🏠</button>
+            <button id="minimizeFloat" class="control-btn" title="最小化">➖</button>
+        </div>
+    </div>
+
+    <script src="js/floating.js"></script>
+</body>
+</html>

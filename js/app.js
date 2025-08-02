@@ -28,6 +28,9 @@ class TodoApp {
         // 开始自动保存
         this.startAutoSave();
         
+        // 启动实时更新系统
+        this.startRealtimeUpdates();
+        
         console.log('应用初始化完成');
     }
 
@@ -59,17 +62,57 @@ class TodoApp {
 
     // 数据验证和修复
     validateAndFixData() {
+        console.log('[DATA_VALIDATION] Starting data validation and repair process');
+        
+        // 防止无限修复循环
+        if (this._isValidating) {
+            console.log('[DATA_VALIDATION] Already validating, skipping...');
+            return;
+        }
+        this._isValidating = true;
+        
+        let hasChanges = false;
+        
         // 确保必要的数据结构存在
         if (!this.data.checklists) this.data.checklists = [];
         if (!this.data.archivedChecklists) this.data.archivedChecklists = [];
         if (!this.data.templates) this.data.templates = [];
         if (!this.data.settings) this.data.settings = {};
         if (!this.data.weeklyPlan) this.data.weeklyPlan = '';
+        
+        console.log('[DATA_VALIDATION] Current data structure:', {
+            checklists: this.data.checklists.length,
+            archivedChecklists: this.data.archivedChecklists.length,
+            templates: this.data.templates.length
+        });
 
         // 验证清单数据
         this.data.checklists = this.data.checklists.filter(checklist => {
             if (!checklist || !checklist.id || !checklist.name) return false;
             if (!Array.isArray(checklist.tasks)) checklist.tasks = [];
+            
+            // 添加预期工作时间字段（如果不存在）
+            if (typeof checklist.expectedWorkTime !== 'number') {
+                console.log('[DATA_VALIDATION] Adding expectedWorkTime field to checklist:', checklist.name);
+                checklist.expectedWorkTime = 0; // 默认为0，表示未设置
+                hasChanges = true;
+            }
+            
+            // 修复从模板创建但没有继承expectedWorkTime的清单（仅在首次加载时）
+            if (checklist.expectedWorkTime === 0 && checklist.templateId && !checklist._expectedTimeFixed) {
+                const template = this.data.templates.find(t => t.id === checklist.templateId);
+                if (template && template.expectedWorkTime && template.expectedWorkTime > 0) {
+                    checklist.expectedWorkTime = template.expectedWorkTime * 3600; // 模板是小时，转换为秒
+                    checklist._expectedTimeFixed = true; // 标记已修复，避免重复修复
+                    console.log('[DATA_VALIDATION] Fixed checklist expected work time inheritance:', {
+                        checklistName: checklist.name,
+                        templateName: template.name,
+                        inheritedHours: template.expectedWorkTime,
+                        inheritedSeconds: checklist.expectedWorkTime
+                    });
+                    hasChanges = true;
+                }
+            }
             
             // 验证任务数据
             checklist.tasks = checklist.tasks.filter(task => {
@@ -85,10 +128,63 @@ class TodoApp {
             return true;
         });
 
-        console.log('数据验证完成');
+        // 验证模板数据并添加预期工作时间
+        let templatesModified = false;
+        console.log('[DATA_VALIDATION] Validating templates...');
+        
+        this.data.templates = this.data.templates.map(template => {
+            if (!template || !template.id || !template.name) return template;
+            
+            // 添加预期工作时间字段（如果不存在）
+            if (typeof template.expectedWorkTime !== 'number') {
+                templatesModified = true;
+                console.log('[DATA_VALIDATION] Adding expectedWorkTime to template:', template.name);
+                
+                // 为默认模板设置合理的预期工作时间
+                if (template.id === 'work') {
+                    template.expectedWorkTime = 8; // 工作模板默认8小时
+                    console.log('[DATA_VALIDATION] Set work template default time: 8 hours');
+                } else if (template.id === 'study') {
+                    template.expectedWorkTime = 4; // 学习模板默认4小时
+                    console.log('[DATA_VALIDATION] Set study template default time: 4 hours');
+                } else if (template.id === 'default') {
+                    template.expectedWorkTime = 6; // 默认模板6小时
+                    console.log('[DATA_VALIDATION] Set default template default time: 6 hours');
+                } else {
+                    template.expectedWorkTime = 0; // 其他模板默认0
+                    console.log('[DATA_VALIDATION] Set custom template default time: 0 hours');
+                }
+            }
+            
+            // 确保任务数组存在
+            if (!Array.isArray(template.tasks)) template.tasks = [];
+            
+            return template;
+        });
+
+        // 标记验证完成
+        this._isValidating = false;
+        
+        console.log('[DATA_VALIDATION] Validation completed:', {
+            hasChanges,
+            templatesModified,
+            willSave: hasChanges || templatesModified
+        });
+        
+        // 只有在有修改时才保存，并且不在验证中
+        if ((hasChanges || templatesModified) && !this._isSaving) {
+            console.log('[DATA_VALIDATION] Changes detected, saving data...');
+            this.saveDataDelayed();
+        }
+
+        console.log('[DATA_VALIDATION] Data validation process completed');
     }
 
     async saveData() {
+        // 防止重复保存
+        if (this._isSaving) return true;
+        this._isSaving = true;
+        
         try {
             await window.electronAPI.saveData(this.data);
             console.log('数据保存成功');
@@ -97,13 +193,20 @@ class TodoApp {
             console.error('保存数据失败:', error);
             this.showNotification('保存数据失败', 'error');
             return false;
+        } finally {
+            this._isSaving = false;
         }
     }
 
     // 防抖保存 - 避免频繁保存
-    debouncedSave = this.debounce(async () => {
-        await this.saveData();
-    }, 1000);
+    saveDataDelayed() {
+        if (this._saveTimeout) {
+            clearTimeout(this._saveTimeout);
+        }
+        this._saveTimeout = setTimeout(() => {
+            this.saveData();
+        }, 1000);
+    }
 
     // 防抖工具函数
     debounce(func, wait) {
@@ -125,11 +228,139 @@ class TodoApp {
         }, 30000);
     }
 
+    // 启动实时更新系统
+    startRealtimeUpdates() {
+        // 每秒更新计时器显示和进度条
+        this.realtimeUpdateInterval = setInterval(() => {
+            this.updateRealtimeDisplays();
+        }, 1000);
+    }
+
+    // 实时更新显示
+    updateRealtimeDisplays() {
+        if (!this.currentChecklist) return;
+
+        let hasRunningTasks = false;
+        let needsUpdate = false;
+
+        // 更新正在运行的任务时间
+        this.currentChecklist.tasks.forEach(task => {
+            if (task.isRunning && task.startTime) {
+                hasRunningTasks = true;
+                const currentTime = Math.floor((Date.now() - task.startTime) / 1000);
+                const newSpentTime = (task.spentTime || 0) + currentTime;
+                
+                // 更新计时器显示
+                const timerDisplay = document.querySelector(`[data-task-id="${task.id}"].timer-display`);
+                if (timerDisplay) {
+                    if (task.type === 'countdown') {
+                        const remaining = Math.max(0, task.duration - newSpentTime);
+                        timerDisplay.textContent = this.formatTime(remaining);
+                        if (remaining <= 0) {
+                            timerDisplay.classList.add('expired');
+                        }
+                    } else {
+                        timerDisplay.textContent = this.formatTime(newSpentTime);
+                    }
+                }
+                needsUpdate = true;
+            }
+        });
+
+        // 如果有正在运行的任务，更新统计信息和进度条
+        if (hasRunningTasks && needsUpdate) {
+            // 计算当前总花费时间（包括正在运行的任务）
+            const totalSpentTime = this.calculateCurrentSpentTime();
+            
+            // 更新统计显示
+            const totalTimeElement = document.getElementById('totalTime');
+            if (totalTimeElement) {
+                totalTimeElement.textContent = `已工作: ${this.formatTime(totalSpentTime)}`;
+            }
+            
+            // 更新进度条
+            this.updateProgressBarDisplay(totalSpentTime, this.currentChecklist.expectedWorkTime);
+        }
+    }
+
+    // 更新进度条显示
+    updateProgressBarDisplay(spentTime, expectedWorkTime) {
+        const progressSection = document.getElementById('progressSection');
+        const progressText = document.getElementById('progressText');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const progressFill = document.getElementById('progressFill');
+        
+        if (!progressSection || !progressText || !progressPercentage || !progressFill) {
+            return; // 如果元素不存在，直接返回
+        }
+        
+        // 始终显示进度条
+        progressSection.style.display = 'block';
+
+        if (!expectedWorkTime || expectedWorkTime <= 0) {
+            // 如果没有设置预期工作时间，显示空的进度条
+            progressText.textContent = `工作进度 (未设置预期时间)`;
+            progressPercentage.textContent = `已工作: ${this.formatTime(spentTime)}`;
+            progressFill.style.width = '0%';
+            progressFill.className = 'progress-fill';
+            return;
+        }
+
+        // 计算进度百分比
+        const progressPercent = Math.min((spentTime / expectedWorkTime) * 100, 100);
+        const actualPercent = (spentTime / expectedWorkTime) * 100;
+
+        // 更新文本
+        progressText.textContent = `工作进度 (预期: ${this.formatTime(expectedWorkTime)})`;
+        progressPercentage.textContent = `${Math.round(actualPercent)}%`;
+
+        // 更新进度条
+        progressFill.style.width = `${Math.min(progressPercent, 100)}%`;
+
+        // 根据进度设置不同的样式
+        progressFill.className = 'progress-fill';
+        
+        if (actualPercent >= 100) {
+            // 检查是否所有任务都完成
+            const completedTasks = this.currentChecklist.tasks.filter(task => task.completed).length;
+            const totalTasks = this.currentChecklist.tasks.length;
+            const allTasksCompleted = totalTasks > 0 && completedTasks === totalTasks;
+            
+            if (allTasksCompleted) {
+                progressFill.classList.add('complete');
+            } else {
+                progressFill.classList.add('over-100');
+            }
+        }
+    }
+
+    // 计算当前实际花费时间（包括正在运行的任务）
+    calculateCurrentSpentTime() {
+        if (!this.currentChecklist || !this.currentChecklist.tasks) return 0;
+        
+        return this.currentChecklist.tasks.reduce((total, task) => {
+            let taskTime = task.spentTime || 0;
+            
+            // 如果任务正在运行，加上当前会话时间
+            if (task.isRunning && task.startTime) {
+                const sessionTime = Math.floor((Date.now() - task.startTime) / 1000);
+                taskTime += sessionTime;
+            }
+            
+            return total + taskTime;
+        }, 0);
+    }
+
     // 清理资源
     cleanup() {
         // 清理自动保存定时器
         if (this.autoSaveInterval) {
             clearInterval(this.autoSaveInterval);
+        }
+        
+        // 清理实时更新定时器
+        if (this.realtimeUpdateInterval) {
+            clearInterval(this.realtimeUpdateInterval);
         }
         
         // 清理所有任务计时器
@@ -138,10 +369,51 @@ class TodoApp {
         });
         this.timers.clear();
         
+        // 移除悬浮窗消息监听器
+        window.electronAPI.removeTaskTimerListener();
+        
         console.log('应用资源清理完成');
     }
 
+    // 根据ID查找任务
+    findTaskById(taskId) {
+        for (let checklist of this.data.checklists) {
+            if (checklist.tasks) {
+                const task = checklist.tasks.find(t => t.id === taskId);
+                if (task) return task;
+            }
+        }
+        return null;
+    }
+
+    // 重新渲染当前视图
+    renderCurrentView() {
+        if (this.currentView === 'checklists') {
+            this.renderChecklistsView();
+        } else if (this.currentView === 'templates') {
+            this.renderTemplatesView();
+        } else if (this.currentView === 'checklist' && this.currentChecklist) {
+            this.renderChecklistView(this.currentChecklist);
+        }
+    }
+
     initEventListeners() {
+        // 监听悬浮窗计时器操作
+        window.electronAPI.onTaskTimerUpdated((event, taskId, isRunning) => {
+            console.log('收到悬浮窗计时器更新:', taskId, isRunning);
+            // 同步主应用的计时器状态
+            const task = this.findTaskById(taskId);
+            if (task) {
+                if (isRunning) {
+                    this.startTaskTimer(taskId);
+                } else {
+                    this.stopTaskTimer(taskId);
+                }
+                // 更新UI显示
+                this.renderCurrentView();
+            }
+        });
+
         // 顶部导航按钮
         document.getElementById('newChecklistBtn').addEventListener('click', () => {
             this.showCreateChecklistModal();
@@ -157,6 +429,16 @@ class TodoApp {
 
         document.getElementById('archiveBtn').addEventListener('click', () => {
             this.showView('archive');
+        });
+
+        document.getElementById('floatingBtn').addEventListener('click', async () => {
+            try {
+                await window.electronAPI.toggleFloatingWindow();
+                this.showNotification('悬浮窗已切换', 'info');
+            } catch (error) {
+                console.error('切换悬浮窗失败:', error);
+                this.showNotification('切换悬浮窗失败', 'error');
+            }
         });
 
         // 本周计划相关

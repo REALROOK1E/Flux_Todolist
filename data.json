@@ -1,0 +1,67 @@
+{
+  "checklists": [
+    {
+      "id": "test_checklist_1",
+      "name": "工作清单",
+      "description": "今日工作任务",
+      "status": "active",
+      "createdAt": "2025-08-01T10:00:00.000Z",
+      "tasks": [
+        {
+          "id": "task_1",
+          "title": "写项目文档",
+          "type": "timer",
+          "duration": 0,
+          "spentTime": 1800,
+          "completed": false,
+          "status": "idle",
+          "startTime": null
+        },
+        {
+          "id": "task_2", 
+          "title": "代码审查",
+          "type": "countdown",
+          "duration": 30,
+          "spentTime": 900,
+          "completed": false,
+          "status": "idle",
+          "startTime": null
+        },
+        {
+          "id": "task_3",
+          "title": "团队会议",
+          "type": "countdown", 
+          "duration": 60,
+          "spentTime": 0,
+          "completed": false,
+          "status": "idle",
+          "startTime": null
+        }
+      ]
+    }
+  ],
+  "archivedChecklists": [],
+  "templates": [
+    {
+      "id": "default",
+      "name": "默认模板",
+      "tasks": ["任务 1", "任务 2", "任务 3"]
+    },
+    {
+      "id": "work",
+      "name": "工作模板", 
+      "tasks": ["检查邮件", "参加会议", "完成报告", "整理文档"]
+    },
+    {
+      "id": "study",
+      "name": "学习模板",
+      "tasks": ["阅读资料", "做笔记", "练习题目", "复习总结"]
+    }
+  ],
+  "settings": {
+    "theme": "pixel",
+    "autoSave": true,
+    "enableNotifications": true,
+    "enableSounds": true
+  }
+}

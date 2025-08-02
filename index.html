@@ -26,6 +26,9 @@
                     <button id="archiveBtn" class="btn btn-secondary pixel-btn" title="归档">
                         📦
                     </button>
+                    <button id="floatingBtn" class="btn btn-secondary pixel-btn" title="切换悬浮窗">
+                        🎯
+                    </button>
                 </div>
             </div>
         </header>
@@ -82,6 +85,29 @@
                                 <span id="completedTasks" class="stat">已完成: 0</span>
                                 <span id="totalTime" class="stat">总时长: 00:00:00</span>
                                 <span id="remainingTime" class="stat">剩余: 00:00:00</span>
+                            </div>
+                            <div class="progress-section" id="progressSection" style="margin-top: 12px;">
+                                <div class="progress-info">
+                                    <span id="progressText" class="progress-text">工作进度</span>
+                                    <span id="progressPercentage" class="progress-percentage">0%</span>
+                                    <button id="editExpectedTimeBtn" class="edit-time-btn" title="编辑预期工作时间">✏️</button>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" id="progressBar">
+                                        <div class="progress-fill" id="progressFill"></div>
+                                    </div>
+                                </div>
+                                <!-- 编辑预期工作时间的输入框 -->
+                                <div id="editExpectedTimeSection" class="edit-time-section" style="display: none;">
+                                    <div class="edit-time-input">
+                                        <label for="editExpectedTimeInput">预期工作时间 (小时):</label>
+                                        <input type="number" id="editExpectedTimeInput" min="0" step="0.5" placeholder="0">
+                                        <div class="edit-time-buttons">
+                                            <button id="saveExpectedTimeBtn" class="btn-primary">保存</button>
+                                            <button id="cancelExpectedTimeBtn" class="btn-secondary">取消</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="detail-actions">

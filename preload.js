@@ -15,5 +15,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 模板相关
   getTemplates: () => ipcRenderer.invoke('get-templates'),
   saveTemplate: (template) => ipcRenderer.invoke('save-template', template),
-  deleteTemplate: (id) => ipcRenderer.invoke('delete-template', id)
+  deleteTemplate: (id) => ipcRenderer.invoke('delete-template', id),
+
+  // 悬浮窗相关
+  getFloatingData: () => ipcRenderer.invoke('get-floating-data'),
+  getCurrentWorkTime: () => ipcRenderer.invoke('get-current-work-time'),
+  updateTaskStatus: (taskId, updates) => ipcRenderer.invoke('update-task-status', taskId, updates),
+  toggleTaskTimer: (taskId) => ipcRenderer.invoke('toggle-task-timer', taskId),
+  focusMainWindow: () => ipcRenderer.invoke('focus-main-window'),
+  minimizeFloat: () => ipcRenderer.invoke('minimize-float'),
+  resizeFloatingWindow: (expanded) => ipcRenderer.invoke('resize-floating-window', expanded),
+  toggleFloatingWindow: () => ipcRenderer.invoke('toggle-floating-window'),
+  
+  // 监听主进程消息
+  onTaskTimerUpdated: (callback) => ipcRenderer.on('task-timer-updated', callback),
+  removeTaskTimerListener: () => ipcRenderer.removeAllListeners('task-timer-updated')
 });

@@ -1327,7 +1327,7 @@ body {
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6, #10b981);
+    background: transparent;
     transition: width 0.3s ease;
     position: relative;
     border-radius: 9px;
@@ -1368,6 +1368,153 @@ body {
     font-weight: 600;
     border: 1px solid rgba(16, 185, 129, 0.5);
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* 进度条样式 */
+.progress-section {
+    margin-top: 12px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.edit-time-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-left: 8px;
+    transition: all 0.2s ease;
+}
+
+.edit-time-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.1);
+}
+
+.edit-time-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.edit-time-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edit-time-input label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.edit-time-input input {
+    padding: 6px 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 0.875rem;
+    width: 100px;
+}
+
+.edit-time-input input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.edit-time-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.edit-time-buttons button {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.edit-time-buttons .btn-primary {
+    background: #10b981;
+    color: white;
+}
+
+.edit-time-buttons .btn-primary:hover {
+    background: #059669;
+}
+
+.edit-time-buttons .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.edit-time-buttons .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.progress-percentage {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #10b981 !important;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    width: 0%;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+.progress-fill.over-100 {
+    background: #f59e0b !important;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.progress-fill.complete {
+    background: #8b5cf6 !important;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
 }
 
 /* 空状态 - 优化设计 */
