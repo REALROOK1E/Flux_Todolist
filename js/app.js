@@ -263,6 +263,20 @@ class TodoApp {
                         timerDisplay.textContent = this.formatTime(newSpentTime);
                     }
                 }
+                
+                // 更新任务元数据中的"已用"时间显示
+                const taskElement = document.querySelector(`[data-id="${task.id}"]`);
+                if (taskElement) {
+                    const taskMetaSpans = taskElement.querySelectorAll('.task-meta span');
+                    // 找到包含"已用:"的span元素
+                    for (let span of taskMetaSpans) {
+                        if (span.textContent.startsWith('已用:')) {
+                            span.textContent = `已用: ${this.formatTime(newSpentTime)}`;
+                            break;
+                        }
+                    }
+                }
+                
                 needsUpdate = true;
             }
         });

@@ -663,75 +663,260 @@ Object.assign(TodoApp.prototype, {
             return;
         }
 
-        container.innerHTML = this.data.archivedChecklists
-            .sort((a, b) => new Date(b.archivedAt) - new Date(a.archivedAt))
-            .map(checklist => {
-                const completedTasks = checklist.tasks.filter(task => task.completed).length;
-                const totalTasks = checklist.tasks.length;
-                const totalTime = this.calculateTotalTime(checklist.tasks);
-                const spentTime = this.calculateSpentTime(checklist.tasks);
+        // 按归档日期分组
+        const groupedByDate = this.groupArchivedByDate(this.data.archivedChecklists);
 
-                // 计算所有子任务统计
-                const allSubtasks = checklist.tasks.reduce((acc, task) => {
-                    if (task.subtasks && task.subtasks.length > 0) {
-                        acc.push(...task.subtasks);
-                    }
-                    return acc;
-                }, []);
-                const completedSubtasks = allSubtasks.filter(st => st.completed).length;
-                const totalSubtasks = allSubtasks.length;
-
+        container.innerHTML = Object.keys(groupedByDate)
+            .sort((a, b) => new Date(b) - new Date(a))
+            .map(dateKey => {
+                const checklists = groupedByDate[dateKey];
+                const dateLabel = this.formatDateLabel(dateKey);
+                
                 return `
-                    <div class="archived-item">
-                        <div class="archived-header">
-                            <h3 class="archived-title">${checklist.name}</h3>
-                            <span class="archived-date">
-                                归档于: ${new Date(checklist.archivedAt).toLocaleDateString()}
+                    <div class="archived-date-group">
+                        <div class="archived-date-header">
+                            <h3 class="archived-date-title">${dateLabel}</h3>
+                            <span class="archived-count">${checklists.length} 个清单</span>
+                        </div>
+                        <div class="archived-cards">
+                            ${checklists.map(checklist => this.renderArchivedCard(checklist)).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+        // 添加折叠功能
+        this.setupArchiveCardEvents();
+    },
+
+    groupArchivedByDate(archivedChecklists) {
+        const groups = {};
+        archivedChecklists.forEach(checklist => {
+            const date = new Date(checklist.archivedAt);
+            const dateKey = date.toDateString();
+            if (!groups[dateKey]) {
+                groups[dateKey] = [];
+            }
+            groups[dateKey].push(checklist);
+        });
+        return groups;
+    },
+
+    formatDateLabel(dateString) {
+        const date = new Date(dateString);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (date.toDateString() === today.toDateString()) {
+            return '今天';
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return '昨天';
+        } else {
+            const diffTime = Math.abs(today - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays <= 7) {
+                return `${diffDays} 天前`;
+            } else {
+                return date.toLocaleDateString('zh-CN', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+        }
+    },
+
+    renderArchivedCard(checklist) {
+        const completedTasks = checklist.tasks.filter(task => task.completed).length;
+        const totalTasks = checklist.tasks.length;
+        const spentTime = this.calculateSpentTime(checklist.tasks);
+        
+        // 计算所有子任务统计
+        const allSubtasks = checklist.tasks.reduce((acc, task) => {
+            if (task.subtasks && task.subtasks.length > 0) {
+                acc.push(...task.subtasks);
+            }
+            return acc;
+        }, []);
+        const completedSubtasks = allSubtasks.filter(st => st.completed).length;
+        const totalSubtasks = allSubtasks.length;
+
+        // 计算完成度评级
+        const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+        const achievementLevel = this.getAchievementLevel(completionRate, completedSubtasks, totalSubtasks);
+
+        const cardId = `archived-card-${checklist.id}`;
+
+        return `
+            <div class="archived-card" id="${cardId}">
+                <div class="archived-card-header" onclick="app.toggleArchivedCard('${cardId}')">
+                    <div class="archived-card-title-section">
+                        <div class="archived-card-icon">${achievementLevel.icon}</div>
+                        <div class="archived-card-info">
+                            <h4 class="archived-card-title">${checklist.name}</h4>
+                            <div class="archived-card-subtitle">
+                                ${this.formatTime(spentTime)} 专注时间 · ${achievementLevel.label}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="archived-card-controls">
+                        <div class="archived-card-stats">
+                            <span class="completion-badge ${completionRate === 100 ? 'perfect' : completionRate >= 80 ? 'excellent' : completionRate >= 60 ? 'good' : 'partial'}">
+                                ${Math.round(completionRate)}%
                             </span>
+                            ${totalSubtasks > 0 ? `<span class="subtask-badge">${completedSubtasks}/${totalSubtasks} 子项</span>` : ''}
                         </div>
-                        <div class="archived-stats">
-                            <span>任务完成: ${completedTasks}/${totalTasks} (${totalTasks > 0 ? Math.round((completedTasks/totalTasks)*100) : 0}%)</span>
-                            <span>已工作: ${this.formatTime(spentTime)}</span>
-                            ${totalSubtasks > 0 ? `<span>子任务: ${completedSubtasks}/${totalSubtasks}</span>` : ''}
+                        <div class="expand-button">
+                            <span class="expand-icon">▼</span>
                         </div>
-                        <div class="archived-tasks">
-                            <h4 style="margin: 10px 0 5px 0; color: #666; font-size: 14px;">任务详情:</h4>
-                            ${checklist.tasks.map(task => {
-                                const taskCompletedSubtasks = task.subtasks ? task.subtasks.filter(st => st.completed).length : 0;
-                                const taskTotalSubtasks = task.subtasks ? task.subtasks.length : 0;
-                                
+                    </div>
+                </div>
+                
+                <div class="archived-card-content" style="display: none;">
+                    <div class="archived-summary">
+                        <div class="summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">任务完成</span>
+                                <span class="stat-value">${completedTasks}/${totalTasks}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">工作时长</span>
+                                <span class="stat-value">${this.formatTime(spentTime)}</span>
+                            </div>
+                            ${totalSubtasks > 0 ? `
+                                <div class="stat-item">
+                                    <span class="stat-label">子任务</span>
+                                    <span class="stat-value">${completedSubtasks}/${totalSubtasks}</span>
+                                </div>
+                            ` : ''}
+                            <div class="stat-item">
+                                <span class="stat-label">归档时间</span>
+                                <span class="stat-value">${new Date(checklist.archivedAt).toLocaleString('zh-CN')}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="archived-tasks-container">
+                        <h5 class="archived-tasks-title">任务详情</h5>
+                        <div class="archived-tasks-list">
+                            ${checklist.tasks.map(task => this.renderArchivedTask(task)).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    getAchievementLevel(completionRate, completedSubtasks, totalSubtasks) {
+        if (completionRate === 100 && (totalSubtasks === 0 || completedSubtasks === totalSubtasks)) {
+            return { icon: '�', label: '完美完成' };
+        } else if (completionRate >= 90) {
+            return { icon: '⭐', label: '出色完成' };
+        } else if (completionRate >= 70) {
+            return { icon: '�', label: '良好完成' };
+        } else if (completionRate >= 50) {
+            return { icon: '�', label: '部分完成' };
+        } else {
+            return { icon: '�', label: '已归档' };
+        }
+    },
+
+    renderArchivedTask(task) {
+        const taskCompletedSubtasks = task.subtasks ? task.subtasks.filter(st => st.completed).length : 0;
+        const taskTotalSubtasks = task.subtasks ? task.subtasks.length : 0;
+        const hasSubtasks = taskTotalSubtasks > 0;
+        
+        return `
+            <div class="archived-task-item ${task.completed ? 'task-completed' : 'task-incomplete'}">
+                <div class="archived-task-header">
+                    <div class="task-status-icon">
+                        ${task.completed ? '✅' : '⚪'}
+                    </div>
+                    <div class="archived-task-info">
+                        <div class="archived-task-title ${task.completed ? 'completed-text' : 'incomplete-text'}">
+                            ${task.title}
+                        </div>
+                        <div class="archived-task-meta">
+                            <span class="task-type">${task.type === 'timer' ? '正计时' : '倒计时'}</span>
+                            <span class="task-time">⏱ ${this.formatTime(task.spentTime)}</span>
+                            ${hasSubtasks ? `<span class="task-subtasks">📋 ${taskCompletedSubtasks}/${taskTotalSubtasks}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                
+                ${hasSubtasks ? `
+                    <div class="archived-subtasks">
+                        <div class="subtasks-header">
+                            <span class="subtasks-label">子待办事项</span>
+                        </div>
+                        <div class="subtasks-list">
+                            ${task.subtasks.map(subtask => {
+                                const category = this.categorizeSubtask(subtask.text);
                                 return `
-                                    <div class="archived-task ${task.completed ? 'completed' : ''}" style="
-                                        margin: 5px 0; 
-                                        padding: 8px; 
-                                        background: ${task.completed ? '#f0f9ff' : '#fef2f2'}; 
-                                        border-left: 3px solid ${task.completed ? '#10b981' : '#ef4444'}; 
-                                        border-radius: 4px;
-                                        font-size: 13px;
-                                    ">
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 500; ${task.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${task.completed ? '✓' : '✗'} ${task.title}</span>
-                                            <div style="font-size: 11px; color: #666;">
-                                                <span>${task.type === 'timer' ? '正计时' : '倒计时'}</span>
-                                                | 工作时长: ${this.formatTime(task.spentTime)}
-                                            </div>
-                                        </div>
-                                        ${taskTotalSubtasks > 0 ? `
-                                            <div style="margin-top: 5px; padding-left: 15px;">
-                                                <div style="font-size: 11px; color: #888; margin-bottom: 3px;">子任务 (${taskCompletedSubtasks}/${taskTotalSubtasks}):</div>
-                                                ${task.subtasks.map(subtask => `
-                                                    <div style="margin: 2px 0; font-size: 11px; ${subtask.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">
-                                                        ${subtask.completed ? '✓' : '✗'} ${subtask.text}
-                                                    </div>
-                                                `).join('')}
-                                            </div>
-                                        ` : ''}
+                                    <div class="archived-subtask-item ${subtask.completed ? 'subtask-completed' : 'subtask-incomplete'}" 
+                                         data-category="${category}">
+                                        <span class="subtask-icon">${subtask.completed ? '✅' : '⚪'}</span>
+                                        <span class="subtask-text ${subtask.completed ? 'completed-text' : 'incomplete-text'}">
+                                            ${subtask.text}
+                                        </span>
                                     </div>
                                 `;
                             }).join('')}
                         </div>
                     </div>
-                `;
-            }).join('');
+                ` : ''}
+            </div>
+        `;
+    },
+
+    // 智能分类子待办事项
+    categorizeSubtask(text) {
+        const lowerText = text.toLowerCase();
+        
+        // 紧急类：包含时间、deadline等关键词
+        if (/(urgent|紧急|deadline|截止|立即|马上|asap|今天|明天|本周)/.test(lowerText)) {
+            return 'urgent';
+        }
+        
+        // 重要类：包含重要、关键等词汇
+        if (/(重要|关键|核心|主要|important|key|critical|主要)/.test(lowerText)) {
+            return 'important';
+        }
+        
+        // 创意类：包含设计、创作等词汇
+        if (/(设计|创作|创意|想法|brainstorm|design|creative|艺术|美术)/.test(lowerText)) {
+            return 'creative';
+        }
+        
+        // 技术类：包含代码、开发等词汇
+        if (/(代码|编程|开发|技术|code|program|debug|测试|bug|api|数据库|算法)/.test(lowerText)) {
+            return 'technical';
+        }
+        
+        // 日常类：其他常规任务
+        return 'routine';
+    },
+
+    setupArchiveCardEvents() {
+        // 折叠卡片事件已经通过onclick在HTML中设置
+    },
+
+    toggleArchivedCard(cardId) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+
+        const content = card.querySelector('.archived-card-content');
+        const expandIcon = card.querySelector('.expand-icon');
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            expandIcon.textContent = '▲';
+            card.classList.add('expanded');
+        } else {
+            content.style.display = 'none';
+            expandIcon.textContent = '▼';
+            card.classList.remove('expanded');
+        }
     }
 });

@@ -466,8 +466,16 @@ Object.assign(TodoApp.prototype, {
         }
 
         container.innerHTML = this.currentChecklist.tasks.map(task => {
+            // 对于正在运行的任务，使用占位符时间，让实时更新系统处理
+            let displaySpentTime = task.spentTime || 0;
+            if (task.isRunning && task.startTime) {
+                // 计算当前实时时间用于初始显示
+                const sessionTime = Math.floor((Date.now() - task.startTime) / 1000);
+                displaySpentTime = (task.spentTime || 0) + sessionTime;
+            }
+            
             const remainingTime = task.type === 'countdown' ? 
-                Math.max(0, task.duration - task.spentTime) : task.spentTime;
+                Math.max(0, task.duration - displaySpentTime) : displaySpentTime;
 
             // 确保任务有子任务数组
             if (!task.subtasks) {
@@ -485,7 +493,7 @@ Object.assign(TodoApp.prototype, {
                         <div class="task-meta">
                             <span>类型: ${task.type === 'timer' ? '正计时' : '倒计时'}</span>
                             ${task.type === 'countdown' ? `<span>预计: ${this.formatTime(task.duration)}</span>` : ''}
-                            <span>已用: ${this.formatTime(task.spentTime)}</span>
+                            <span>已用: ${this.formatTime(displaySpentTime)}</span>
                             ${totalSubtasks > 0 ? `<span>子任务: ${completedSubtasks}/${totalSubtasks}</span>` : ''}
                         </div>
                         ${totalSubtasks > 0 ? `
@@ -537,6 +545,14 @@ Object.assign(TodoApp.prototype, {
                 this.toggleSubtaskCompletion(taskId, subtaskId);
             });
         });
+        
+        // 渲染完成后，立即触发一次实时更新以同步正在运行的任务时间
+        if (this.updateRealtimeDisplays) {
+            // 使用短延迟确保DOM更新完成
+            setTimeout(() => {
+                this.updateRealtimeDisplays();
+            }, 10);
+        }
     },
 
     toggleSubtaskCompletion(taskId, subtaskId) {
