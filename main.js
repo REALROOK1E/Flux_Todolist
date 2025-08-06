@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'development') {
 const getUserDataPath = () => {
   try {
     const userDataPath = app.getPath('userData');
-    const dataFile = path.join(userDataPath, 'mytodo-data.json');
+    const dataFile = path.join(userDataPath, 'flux-data.json');
     console.log('用户数据目录:', userDataPath);
     console.log('数据文件路径:', dataFile);
     return dataFile;
@@ -224,7 +224,7 @@ async function saveData() {
     console.error('保存数据失败:', error);
     // 尝试保存到备用位置
     try {
-      const backupFile = path.join(process.cwd(), 'mytodo-backup.json');
+      const backupFile = path.join(process.cwd(), 'flux-backup.json');
       await fs.writeFile(backupFile, JSON.stringify(appData, null, 2), 'utf8');
       console.log('数据已保存到备用位置:', backupFile);
     } catch (backupError) {

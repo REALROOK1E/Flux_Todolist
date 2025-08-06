@@ -78,7 +78,7 @@ build/
 
 # Allow release executables
 !dist/*.exe
-!MyTodo*.exe
+!Flux*.exe
 
 # OS generated files
 .DS_Store

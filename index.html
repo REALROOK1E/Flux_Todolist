@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyTodo - 像素风格清单应用</title>
+    <title>Flux - 时间流动应用</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/pixel.css">
 </head>
@@ -12,7 +12,10 @@
         <!-- 顶部导航栏 -->
         <header class="header">
             <div class="header-content">
-                <h1 class="app-title" onclick="app.showView('checklists')" style="cursor: pointer;" title="返回主页">📋 MyTodo</h1>
+                <h1 class="app-title flux-title" onclick="app.showView('checklists')" style="cursor: pointer;" title="返回主页">
+                    <span class="flux-icon">⚡</span>
+                    <span class="flux-text">Flux</span>
+                </h1>
                 <div class="header-actions">
                     <button id="newChecklistBtn" class="btn btn-primary pixel-btn" title="新建清单">
                         ✚

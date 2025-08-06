@@ -76,7 +76,7 @@ Object.assign(TodoApp.prototype, {
             
             const link = document.createElement('a');
             link.href = url;
-            link.download = `mytodo_backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.download = `flux_backup_${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

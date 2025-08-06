@@ -43,9 +43,7 @@ Object.assign(TodoApp.prototype, {
             </div>
         `).join('');
 
-        // 设置新建模板按钮事件
-        const newTemplateBtn = document.getElementById('newTemplateBtn');
-        newTemplateBtn.onclick = () => this.showCreateTemplateModal();
+        // 模板按钮事件已在 app.js 中统一绑定
     },
 
     showCreateTemplateModal() {

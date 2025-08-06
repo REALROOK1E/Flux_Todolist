@@ -118,6 +118,175 @@ body {
     gap: var(--space-3);
 }
 
+/* Flux 简约线条字体样式 */
+.flux-title {
+    font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 200;
+    color: #2c3e50;
+    letter-spacing: 0.4em;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-transform: uppercase;
+}
+
+.flux-title:hover {
+    transform: translateY(-2px);
+    letter-spacing: 0.5em;
+}
+
+.flux-icon {
+    font-size: 1.6rem;
+    color: #3498db;
+    animation: fluxFlow 3s ease-in-out infinite;
+    position: relative;
+}
+
+.flux-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: fluxRipple 2s ease-out infinite;
+}
+
+.flux-text {
+    position: relative;
+    color: #2c3e50;
+    font-weight: 100;
+    letter-spacing: inherit;
+    overflow: hidden;
+}
+
+.flux-text::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(52, 152, 219, 0.1) 20%, 
+        rgba(52, 152, 219, 0.3) 50%, 
+        rgba(52, 152, 219, 0.1) 80%, 
+        transparent 100%);
+    animation: fluxSweep 4s ease-in-out infinite;
+}
+
+.flux-text::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #3498db, #9b59b6, #3498db);
+    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.flux-title:hover .flux-text::after {
+    width: 100%;
+}
+
+/* 流动线条装饰 */
+.flux-title::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -20px;
+    width: 15px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #3498db);
+    transform: translateY(-50%);
+    animation: fluxLineBefore 3s ease-in-out infinite;
+}
+
+.flux-title::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -20px;
+    width: 15px;
+    height: 1px;
+    background: linear-gradient(90deg, #3498db, transparent);
+    transform: translateY(-50%);
+    animation: fluxLineAfter 3s ease-in-out infinite;
+}
+
+/* 动画定义 */
+@keyframes fluxFlow {
+    0%, 100% {
+        transform: translateX(0) rotate(0deg);
+        color: #3498db;
+    }
+    25% {
+        transform: translateX(2px) rotate(90deg);
+        color: #9b59b6;
+    }
+    50% {
+        transform: translateX(0) rotate(180deg);
+        color: #e74c3c;
+    }
+    75% {
+        transform: translateX(-2px) rotate(270deg);
+        color: #f39c12;
+    }
+}
+
+@keyframes fluxRipple {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.8);
+        opacity: 0;
+    }
+}
+
+@keyframes fluxSweep {
+    0% {
+        left: -100%;
+    }
+    50% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes fluxLineBefore {
+    0%, 100% {
+        width: 15px;
+        opacity: 0.6;
+    }
+    50% {
+        width: 25px;
+        opacity: 1;
+    }
+}
+
+@keyframes fluxLineAfter {
+    0%, 100% {
+        width: 15px;
+        opacity: 0.6;
+    }
+    50% {
+        width: 25px;
+        opacity: 1;
+    }
+}
+
 .app-title::before {
     content: "✓";
     display: inline-block;

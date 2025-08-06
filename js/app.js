@@ -405,6 +405,11 @@ class TodoApp {
             this.showView('templates');
         });
 
+        // 新建模板按钮事件
+        document.getElementById('newTemplateBtn').addEventListener('click', () => {
+            this.showCreateTemplateModal();
+        });
+
         document.getElementById('statsBtn').addEventListener('click', () => {
             this.showView('stats');
         });

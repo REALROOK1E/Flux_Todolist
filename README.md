@@ -1,6 +1,6 @@
-# MyTodo - 像素风格 Electron 清单应用
+# Flux - 像素风格时间流动应用
 
-[![Version](https://img.shields.io/badge/version-2.14.0-blue.svg)](https://github.com/REALROOK1E/Mytodo/releases/tag/v2.14.0)
+[![Version](https://img.shields.io/badge/version-2.15.0-blue.svg)](https://github.com/REALROOK1E/Flux/releases/tag/v2.15.0)
 [![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -34,7 +34,7 @@
 
 ## 📥 下载安装
 
-### 最新版本 v2.14.0 (2025-08-07)
+### 最新版本 v2.15.0 (2025-08-07)
 请访问我的网站ernestli.site,右侧有个悬浮窗，点击就下载
 ### 版本更新 🆕
 
@@ -127,7 +127,7 @@ npm run build
 ## 文件结构
 
 ```
-mytodo/
+flux/
 ├── main.js           # Electron 主进程
 ├── preload.js        # 预加载脚本
 ├── index.html        # 主界面
@@ -177,7 +177,7 @@ mytodo/
 - **前端**: HTML5 + CSS3 + Vanilla JavaScript (ES6+)
 - **数据存储**: JSON 文件本地存储
 - **构建工具**: electron-builder 24.13.3
-- **版本**: v2.14.0
+- **版本**: v2.15.0
 
 ## 开发计划
 
