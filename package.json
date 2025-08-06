@@ -1,6 +1,6 @@
 {
   "name": "flux-electron",
-  "version": "2.15.0",
+  "version": "2.16.0",
   "description": "像素风格的 Electron 时间流动应用 - 体验专注工作的流动状态",
   "main": "main.js",
   "homepage": "https://github.com/REALROOK1E/Flux",
@@ -35,7 +35,7 @@
     "copyright": "Copyright © 2025 REALROOK1E",
     "directories": {
       "output": "dist",
-      "buildResources": "build"
+      "buildResources": "assets"
     },
     "files": [
       "**/*",
@@ -50,6 +50,7 @@
       "!dist/**/*"
     ],
     "win": {
+      "icon": "assets/icon.ico",
       "target": [
         {
           "target": "nsis",
@@ -63,10 +64,12 @@
       "requestedExecutionLevel": "asInvoker"
     },
     "mac": {
+      "icon": "assets/icon.icns",
       "target": "dmg",
       "category": "public.app-category.productivity"
     },
     "linux": {
+      "icon": "assets/icon.png",
       "target": [
         "AppImage",
         "deb"
