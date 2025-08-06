@@ -1,0 +1,68 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 渐变定义 -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3498db"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    
+    <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.9"/>
+    </linearGradient>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- 背景圆形 -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" stroke="#1e40af" stroke-width="4"/>
+  
+  <!-- 主要流动线条 -->
+  <path d="M120 200 Q200 150, 280 200 T420 200" 
+        stroke="url(#flowGradient)" 
+        stroke-width="12" 
+        fill="none" 
+        stroke-linecap="round"
+        filter="url(#glow)"/>
+  
+  <path d="M120 256 Q200 220, 280 256 T420 256" 
+        stroke="url(#flowGradient)" 
+        stroke-width="16" 
+        fill="none" 
+        stroke-linecap="round"
+        filter="url(#glow)"/>
+  
+  <path d="M120 312 Q200 280, 280 312 T420 312" 
+        stroke="url(#flowGradient)" 
+        stroke-width="12" 
+        fill="none" 
+        stroke-linecap="round"
+        filter="url(#glow)"/>
+  
+  <!-- 中心闪电符号 -->
+  <path d="M240 180 L280 220 L260 240 L300 280 L260 260 L280 240 L240 200 Z" 
+        fill="#ffffff" 
+        filter="url(#glow)"
+        opacity="0.95"/>
+  
+  <!-- 装饰性小圆点 -->
+  <circle cx="140" cy="200" r="6" fill="#ffffff" opacity="0.8"/>
+  <circle cx="380" cy="200" r="6" fill="#ffffff" opacity="0.8"/>
+  <circle cx="140" cy="312" r="6" fill="#ffffff" opacity="0.8"/>
+  <circle cx="380" cy="312" r="6" fill="#ffffff" opacity="0.8"/>
+  
+  <!-- 外层光晕环 -->
+  <circle cx="256" cy="256" r="240" 
+          fill="none" 
+          stroke="#ffffff" 
+          stroke-width="2" 
+          opacity="0.3"/>
+</svg>

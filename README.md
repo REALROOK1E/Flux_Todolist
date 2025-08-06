@@ -35,7 +35,10 @@
 ## 📥 下载安装
 
 ### 最新版本 v2.15.0 (2025-08-07)
-请访问我的网站ernestli.site,右侧有个悬浮窗，点击就下载
+直接进入release：
+https://github.com/REALROOK1E/Mytodo/releases/tag/v2.16
+
+请访问我的网站ernestli.site,右侧有个悬浮窗，点击也可以进入，主要是进我网站看看!
 ### 版本更新 🆕
 
 [查看完整更新日志](CHANGELOG_v1.2.1.md)

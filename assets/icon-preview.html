@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flux 图标预览和转换</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            margin: 0 0 30px 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+        
+        .icon-preview {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .icon-size {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .icon-size h3 {
+            margin: 0 0 15px 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .icon-container {
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+            max-width: 600px;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #ffffff;
+        }
+        
+        .instructions ol {
+            line-height: 1.8;
+        }
+        
+        .tools {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            max-width: 600px;
+        }
+        
+        .tools a {
+            color: #ffffff;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        
+        .tools a:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Flux 应用图标</h1>
+        
+        <div class="icon-preview">
+            <div class="icon-size">
+                <h3>512x512</h3>
+                <div class="icon-container">
+                    <img src="flux-icon.svg" width="128" height="128" alt="Flux Icon 512x512">
+                </div>
+            </div>
+            
+            <div class="icon-size">
+                <h3>256x256</h3>
+                <div class="icon-container">
+                    <img src="flux-icon.svg" width="64" height="64" alt="Flux Icon 256x256">
+                </div>
+            </div>
+            
+            <div class="icon-size">
+                <h3>128x128</h3>
+                <div class="icon-container">
+                    <img src="flux-icon.svg" width="32" height="32" alt="Flux Icon 128x128">
+                </div>
+            </div>
+            
+            <div class="icon-size">
+                <h3>32x32</h3>
+                <div class="icon-container">
+                    <img src="flux-icon.svg" width="16" height="16" alt="Flux Icon 32x32">
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🛠️ 图标转换步骤</h3>
+            <ol>
+                <li>在浏览器中右键点击上方的 512x512 图标</li>
+                <li>选择 "另存为图片" 或 "复制图片"</li>
+                <li>将图片保存为 PNG 格式 (建议命名为 icon-512.png)</li>
+                <li>使用下方的在线工具转换为所需格式</li>
+                <li>将转换后的文件放入 assets 目录</li>
+            </ol>
+        </div>
+        
+        <div class="tools">
+            <h3>🔧 推荐转换工具</h3>
+            <p><strong>ICO 转换 (Windows):</strong><br>
+            <a href="https://convertio.co/png-ico/" target="_blank">https://convertio.co/png-ico/</a></p>
+            
+            <p><strong>ICNS 转换 (macOS):</strong><br>
+            <a href="https://cloudconvert.com/png-to-icns" target="_blank">https://cloudconvert.com/png-to-icns</a></p>
+            
+            <p><strong>多格式转换:</strong><br>
+            <a href="https://favicon.io/favicon-converter/" target="_blank">https://favicon.io/favicon-converter/</a></p>
+        </div>
+    </div>
+</body>
+</html>
