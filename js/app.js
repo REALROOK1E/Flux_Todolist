@@ -138,22 +138,7 @@ class TodoApp {
             // 添加预期工作时间字段（如果不存在）
             if (typeof template.expectedWorkTime !== 'number') {
                 templatesModified = true;
-                console.log('[DATA_VALIDATION] Adding expectedWorkTime to template:', template.name);
-                
-                // 为默认模板设置合理的预期工作时间
-                if (template.id === 'work') {
-                    template.expectedWorkTime = 8; // 工作模板默认8小时
-                    console.log('[DATA_VALIDATION] Set work template default time: 8 hours');
-                } else if (template.id === 'study') {
-                    template.expectedWorkTime = 4; // 学习模板默认4小时
-                    console.log('[DATA_VALIDATION] Set study template default time: 4 hours');
-                } else if (template.id === 'default') {
-                    template.expectedWorkTime = 6; // 默认模板6小时
-                    console.log('[DATA_VALIDATION] Set default template default time: 6 hours');
-                } else {
-                    template.expectedWorkTime = 0; // 其他模板默认0
-                    console.log('[DATA_VALIDATION] Set custom template default time: 0 hours');
-                }
+                template.expectedWorkTime = 0; // 默认0小时
             }
             
             // 确保任务数组存在
@@ -284,7 +269,7 @@ class TodoApp {
         // 如果有正在运行的任务，更新统计信息和进度条
         if (hasRunningTasks && needsUpdate) {
             // 计算当前总花费时间（包括正在运行的任务）
-            const totalSpentTime = this.calculateCurrentSpentTime();
+            const totalSpentTime = this.calculateSpentTime(this.currentChecklist.tasks);
             
             // 更新统计显示
             const totalTimeElement = document.getElementById('totalTime');
@@ -346,23 +331,6 @@ class TodoApp {
                 progressFill.classList.add('over-100');
             }
         }
-    }
-
-    // 计算当前实际花费时间（包括正在运行的任务）
-    calculateCurrentSpentTime() {
-        if (!this.currentChecklist || !this.currentChecklist.tasks) return 0;
-        
-        return this.currentChecklist.tasks.reduce((total, task) => {
-            let taskTime = task.spentTime || 0;
-            
-            // 如果任务正在运行，加上当前会话时间
-            if (task.isRunning && task.startTime) {
-                const sessionTime = Math.floor((Date.now() - task.startTime) / 1000);
-                taskTime += sessionTime;
-            }
-            
-            return total + taskTime;
-        }, 0);
     }
 
     // 清理资源
@@ -487,20 +455,21 @@ class TodoApp {
             this.hideModal();
         });
 
-        // 点击模态框外部关闭
+        // 点击模态框外部不会关闭，只有特定操作才能关闭
         document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') {
-                this.hideModal();
-            }
+            // 移除自动关闭功能，用户必须明确点击关闭按钮
+            e.stopPropagation();
+        });
+
+        // 阻止模态框内容区域的点击事件冒泡
+        document.querySelector('.modal-content').addEventListener('click', (e) => {
+            e.stopPropagation();
         });
 
         // 键盘快捷键
         document.addEventListener('keydown', (e) => {
-            // Escape 键关闭模态框
-            if (e.key === 'Escape') {
-                this.hideModal();
-                return;
-            }
+            // 移除 Escape 键关闭模态框功能，防止误操作
+            // 用户必须明确点击关闭按钮
             
             // Ctrl+S 保存数据
             if (e.ctrlKey && e.key === 's') {
@@ -710,7 +679,17 @@ class TodoApp {
     }
 
     calculateSpentTime(tasks) {
-        return tasks.reduce((total, task) => total + (task.spentTime || 0), 0);
+        return tasks.reduce((total, task) => {
+            let taskTime = task.spentTime || 0;
+            
+            // 如果任务正在运行，加上当前运行时间
+            if (task.isRunning && task.startTime) {
+                const sessionTime = Math.floor((Date.now() - task.startTime) / 1000);
+                taskTime += sessionTime;
+            }
+            
+            return total + taskTime;
+        }, 0);
     }
 
     formatTime(seconds) {
@@ -732,6 +711,16 @@ class TodoApp {
         modalBody.innerHTML = body;
         modalFooter.style.display = showFooter ? 'flex' : 'none';
         modal.classList.remove('hidden');
+
+        // 防止模态框标题区域的事件干扰
+        const modalHeader = modal.querySelector('.modal-header');
+        modalHeader.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+        
+        modalHeader.addEventListener('mousemove', (e) => {
+            e.stopPropagation();
+        });
     }
 
     hideModal() {

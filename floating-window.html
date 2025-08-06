@@ -12,7 +12,11 @@
         <div id="mainFloat" class="main-float">
             <div class="float-header">
                 <span id="currentChecklistName" class="checklist-name">无活动清单</span>
-                <button id="toggleTasks" class="toggle-btn" title="展开/收起任务">📋</button>
+                <div class="header-controls">
+                    <button id="toggleTasks" class="header-btn" title="展开/收起任务">📋</button>
+                    <button id="openMainApp" class="header-btn" title="打开主应用">🏠</button>
+                    <button id="minimizeFloat" class="header-btn" title="最小化">➖</button>
+                </div>
             </div>
             <div class="work-time">
                 <span id="totalWorkTime" class="time-display">00:00:00</span>
@@ -35,12 +39,6 @@
             <div id="tasksContent" class="tasks-content">
                 <!-- 任务项将在这里动态生成 -->
             </div>
-        </div>
-
-        <!-- 控制按钮 -->
-        <div class="controls">
-            <button id="openMainApp" class="control-btn" title="打开主应用">🏠</button>
-            <button id="minimizeFloat" class="control-btn" title="最小化">➖</button>
         </div>
     </div>
 

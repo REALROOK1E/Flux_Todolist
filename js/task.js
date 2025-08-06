@@ -70,6 +70,44 @@ Object.assign(TodoApp.prototype, {
         const confirmBtn = document.getElementById('modalConfirmBtn');
         confirmBtn.onclick = () => this.saveTaskEdit(taskId);
 
+        // 防止模态框意外关闭 - 全面的事件处理
+        const modalContent = document.querySelector('.modal-content');
+        const modalHeader = document.querySelector('.modal-header');
+        
+        // 阻止拖拽事件
+        modalContent.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        modalContent.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        // 阻止标题区域的所有鼠标事件传播
+        modalHeader.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+        
+        modalHeader.addEventListener('mousemove', (e) => {
+            e.stopPropagation();
+        });
+        
+        modalHeader.addEventListener('mouseup', (e) => {
+            e.stopPropagation();
+        });
+        
+        // 防止选择文本时的事件冲突
+        const titleInput = document.getElementById('editTaskTitle');
+        titleInput.addEventListener('selectstart', (e) => {
+            e.stopPropagation();
+        });
+        
+        titleInput.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+
         // 自动聚焦到标题输入框
         setTimeout(() => {
             document.getElementById('editTaskTitle').focus();
@@ -299,8 +337,7 @@ Object.assign(TodoApp.prototype, {
             timerDisplay.textContent = this.formatTime(displayTime);
         }
 
-        // 更新统计信息
-        this.updateChecklistStats();
+        // 统计信息会由实时更新机制自动处理，不需要在这里重复调用
     },
 
     playNotificationSound() {

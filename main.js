@@ -38,23 +38,7 @@ let floatingWindow;
 let appData = {
   checklists: [],
   archivedChecklists: [],
-  templates: [
-    {
-      id: 'default',
-      name: '默认模板',
-      tasks: ['任务 1', '任务 2', '任务 3']
-    },
-    {
-      id: 'work',
-      name: '工作模板',
-      tasks: ['检查邮件', '参加会议', '完成报告', '整理文档']
-    },
-    {
-      id: 'study',
-      name: '学习模板',
-      tasks: ['阅读资料', '做笔记', '练习题目', '复习总结']
-    }
-  ],
+  templates: [],
   settings: {
     theme: 'pixel',
     autoSave: true,

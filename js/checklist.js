@@ -1,7 +1,6 @@
-// 清单管理相关功能扩展
+// 清单相关功能
 Object.assign(TodoApp.prototype, {
     showCreateChecklistModal() {
-        console.log('[MODAL] Opening create checklist modal');
         
         const modalBody = `
             <div class="form-group">
@@ -39,32 +38,23 @@ Object.assign(TodoApp.prototype, {
 
         templateSelect.addEventListener('change', (e) => {
             const templateId = e.target.value;
-            console.log('[TEMPLATE_SELECTION] Template selected:', templateId);
             
             if (templateId) {
                 const template = this.data.templates.find(t => t.id === templateId);
-                console.log('[TEMPLATE_SELECTION] Found template:', template);
                 
                 if (template) {
-                    // 如果模板有简述，自动填入
+                    // 自动填入模板的简述
                     if (template.description && !descriptionInput.value) {
-                        console.log('[TEMPLATE_SELECTION] Auto-filling description:', template.description);
                         descriptionInput.value = template.description;
                     }
                     
-                    // 如果模板有预期工作时间且大于0，自动填入
+                    // 自动填入预期工作时间
                     if (template.expectedWorkTime && template.expectedWorkTime > 0 && !expectedWorkTimeInput.value) {
-                        console.log('[TEMPLATE_SELECTION] Auto-filling expected work time:', template.expectedWorkTime, 'hours');
                         expectedWorkTimeInput.value = template.expectedWorkTime;
-                    } else {
-                        console.log('[TEMPLATE_SELECTION] Not auto-filling work time - template.expectedWorkTime:', template.expectedWorkTime, 'input value:', expectedWorkTimeInput.value);
                     }
-                } else {
-                    console.log('[TEMPLATE_SELECTION] Template not found for ID:', templateId);
                 }
             } else {
-                console.log('[TEMPLATE_SELECTION] No template selected, clearing auto-filled content');
-                // 清空模板相关的自动填入内容
+                // 清空自动填入的内容
                 if (!descriptionInput.value.trim()) {
                     descriptionInput.value = '';
                 }
@@ -93,7 +83,6 @@ Object.assign(TodoApp.prototype, {
     },
 
     async createChecklist() {
-        console.log('[CREATE_CHECKLIST] Starting checklist creation process');
         
         const nameInput = document.getElementById('checklistName');
         const descriptionInput = document.getElementById('checklistDescription');
@@ -105,22 +94,14 @@ Object.assign(TodoApp.prototype, {
         const expectedWorkTime = parseFloat(expectedWorkTimeInput.value) || 0;
         const templateId = templateSelect.value;
         
-        console.log('[CREATE_CHECKLIST] Input values:', {
-            name,
-            description,
-            expectedWorkTime: expectedWorkTime + ' hours',
-            templateId
-        });
-        
         if (!name) {
-            console.log('[CREATE_CHECKLIST] Validation failed: missing name');
             this.showNotification('请输入清单名称', 'warning');
             nameInput.focus();
             return;
         }
 
         try {
-            // 构建新清单对象
+            // 构建新清单
             const newChecklist = {
                 name: name,
                 description: description,
@@ -129,126 +110,77 @@ Object.assign(TodoApp.prototype, {
                 createdAt: new Date().toISOString(),
                 status: 'active'
             };
-            
-            console.log('[CREATE_CHECKLIST] Initial checklist object:', {
-                name: newChecklist.name,
-                expectedWorkTime: newChecklist.expectedWorkTime + ' seconds',
-                description: newChecklist.description
-            });
 
-            // 如果选择了模板，添加模板任务和继承属性
+            // 如果选择了模板，添加模板任务
             if (templateId) {
-                console.log('[CREATE_CHECKLIST] Processing template inheritance for template ID:', templateId);
                 const template = this.data.templates.find(t => t.id === templateId);
                 
                 if (template) {
-                    console.log('[CREATE_CHECKLIST] Found template:', {
-                        id: template.id,
-                        name: template.name,
-                        expectedWorkTime: template.expectedWorkTime + ' hours',
-                        description: template.description,
-                        tasksCount: template.tasks ? template.tasks.length : 0
-                    });
-                    
                     // 继承模板的简述（如果用户没有自定义）
                     if (!description && template.description) {
-                        console.log('[CREATE_CHECKLIST] Inheriting description from template:', template.description);
                         newChecklist.description = template.description;
                     }
                     
-                    // 关键修复：如果用户没有设置预期工作时间，但模板有设置，则继承模板的预期工作时间
+                    // 继承模板的预期工作时间
                     if (expectedWorkTime === 0 && template.expectedWorkTime && template.expectedWorkTime > 0) {
                         const inheritedSeconds = template.expectedWorkTime * 3600;
-                        console.log('[CREATE_CHECKLIST] Inheriting expected work time from template:', template.expectedWorkTime + ' hours =', inheritedSeconds + ' seconds');
                         newChecklist.expectedWorkTime = inheritedSeconds;
-                    } else {
-                        console.log('[CREATE_CHECKLIST] Not inheriting work time:', {
-                            userInputHours: expectedWorkTime,
-                            templateHours: template.expectedWorkTime,
-                            reason: expectedWorkTime > 0 ? 'User provided custom time' : 'Template has no work time or is zero'
-                        });
                     }
                     
-                    // 添加模板引用ID
                     newChecklist.templateId = templateId;
-                    console.log('[CREATE_CHECKLIST] Added template reference ID:', templateId);
                     
                     // 处理模板任务
                     if (template.tasks && template.tasks.length > 0) {
-                        console.log('[CREATE_CHECKLIST] Processing template tasks, count:', template.tasks.length);
-                        
                         newChecklist.tasks = template.tasks.map((task, index) => {
-                            console.log('[CREATE_CHECKLIST] Processing task', index + 1, ':', task);
-                            
-                            // 处理新格式的任务对象
+                            // 新格式的任务对象
                             if (typeof task === 'object' && task !== null && task.title) {
-                                const newTask = {
+                                return {
                                     id: `task_${Date.now()}_${index}`,
                                     title: task.title,
                                     completed: false,
-                                    duration: task.type === 'timer' ? 0 : (task.duration * 60), // 转换为秒
+                                    duration: task.type === 'timer' ? 0 : (task.duration * 60),
                                     type: task.type || 'timer',
                                     spentTime: 0,
                                     isRunning: false,
                                     createdAt: new Date().toISOString(),
                                     subtasks: []
                                 };
-                                console.log('[CREATE_CHECKLIST] Created task object:', newTask);
-                                return newTask;
                             } else {
-                                // 处理旧格式的字符串任务
-                                const newTask = {
+                                // 旧格式的字符串任务
+                                return {
                                     id: `task_${Date.now()}_${index}`,
                                     title: typeof task === 'string' ? task : task.toString(),
                                     completed: false,
                                     duration: 1800, // 默认30分钟
-                                    type: 'timer', // 默认正计时
+                                    type: 'timer',
                                     spentTime: 0,
                                     isRunning: false,
                                     createdAt: new Date().toISOString(),
                                     subtasks: []
                                 };
-                                console.log('[CREATE_CHECKLIST] Created task from string:', newTask);
-                                return newTask;
                             }
                         });
-                    } else {
-                        console.log('[CREATE_CHECKLIST] Template has no tasks');
                     }
-                } else {
-                    console.log('[CREATE_CHECKLIST] Template not found for ID:', templateId);
                 }
             }
 
-            console.log('[CREATE_CHECKLIST] Final checklist object before saving:', {
-                name: newChecklist.name,
-                expectedWorkTime: newChecklist.expectedWorkTime + ' seconds (' + (newChecklist.expectedWorkTime / 3600) + ' hours)',
-                description: newChecklist.description,
-                templateId: newChecklist.templateId,
-                tasksCount: newChecklist.tasks.length
-            });
-
             // 保存到数据库
-            console.log('[CREATE_CHECKLIST] Saving checklist to database...');
             const savedChecklist = await window.electronAPI.createChecklist(newChecklist);
-            console.log('[CREATE_CHECKLIST] Checklist saved successfully with ID:', savedChecklist.id);
             
             // 添加到本地数据
             this.data.checklists.push(savedChecklist);
-            console.log('[CREATE_CHECKLIST] Added checklist to local data, total checklists:', this.data.checklists.length);
             
             this.hideModal();
             this.showNotification('清单创建成功', 'success');
             this.renderChecklistsView();
 
         } catch (error) {
-            console.error('[CREATE_CHECKLIST] Error creating checklist:', error);
+            console.error('创建清单失败:', error);
             this.showNotification('创建清单失败', 'error');
         }
     },
 
     renderChecklistDetailView() {
-        console.log('[DETAIL_VIEW] Rendering checklist detail view for:', this.currentChecklist?.name);
         
         if (!this.currentChecklist) return;
 
@@ -291,7 +223,6 @@ Object.assign(TodoApp.prototype, {
     },
 
     setupEditExpectedTimeEvents() {
-        console.log('[EDIT_TIME] Setting up edit expected time events');
         
         const editBtn = document.getElementById('editExpectedTimeBtn');
         const editSection = document.getElementById('editExpectedTimeSection');
@@ -300,12 +231,10 @@ Object.assign(TodoApp.prototype, {
         const cancelBtn = document.getElementById('cancelExpectedTimeBtn');
 
         if (!editBtn) {
-            console.log('[EDIT_TIME] Edit button not found, skipping setup');
             return;
         }
 
         editBtn.onclick = () => {
-            console.log('[EDIT_TIME] Edit button clicked');
             // 显示编辑界面
             editSection.style.display = 'block';
             
@@ -313,7 +242,6 @@ Object.assign(TodoApp.prototype, {
             const currentHours = this.currentChecklist.expectedWorkTime 
                 ? (this.currentChecklist.expectedWorkTime / 3600).toFixed(1) 
                 : '0';
-            console.log('[EDIT_TIME] Current expected work time:', currentHours, 'hours');
             editInput.value = currentHours;
             editInput.focus();
             editInput.select();
@@ -322,8 +250,6 @@ Object.assign(TodoApp.prototype, {
         saveBtn.onclick = async () => {
             const hours = parseFloat(editInput.value) || 0;
             const seconds = Math.round(hours * 3600);
-            
-            console.log('[EDIT_TIME] Saving new expected work time:', hours, 'hours =', seconds, 'seconds');
             
             // 更新当前清单的预期工作时间
             this.currentChecklist.expectedWorkTime = seconds;
@@ -346,16 +272,14 @@ Object.assign(TodoApp.prototype, {
                 // 隐藏编辑界面
                 editSection.style.display = 'none';
                 
-                console.log('[EDIT_TIME] Expected work time updated successfully');
                 this.showNotification('预期工作时间已更新为 ' + hours + ' 小时', 'success');
             } catch (error) {
-                console.error('[EDIT_TIME] Error updating expected work time:', error);
+                console.error('更新预期工作时间失败:', error);
                 this.showNotification('更新失败', 'error');
             }
         };
 
         cancelBtn.onclick = () => {
-            console.log('[EDIT_TIME] Edit cancelled');
             editSection.style.display = 'none';
         };
 
@@ -370,20 +294,12 @@ Object.assign(TodoApp.prototype, {
     },
 
     updateChecklistStats() {
-        console.log('[STATS] Updating checklist statistics');
         
         if (!this.currentChecklist) return;
 
         const completedTasks = this.currentChecklist.tasks.filter(task => task.completed).length;
         const totalTasks = this.currentChecklist.tasks.length;
         const spentTime = this.calculateSpentTime(this.currentChecklist.tasks);
-
-        console.log('[STATS] Current stats:', {
-            completedTasks,
-            totalTasks,
-            spentTime: spentTime + ' seconds',
-            expectedWorkTime: this.currentChecklist.expectedWorkTime + ' seconds'
-        });
 
         document.getElementById('completedTasks').textContent = `已完成: ${completedTasks}/${totalTasks}`;
         document.getElementById('totalTime').textContent = `已工作: ${this.formatTime(spentTime)}`;
@@ -394,7 +310,6 @@ Object.assign(TodoApp.prototype, {
     },
 
     updateWorkProgressBar(spentTime, expectedWorkTime) {
-        console.log('[PROGRESS_BAR] Updating progress bar - spent:', spentTime, 'expected:', expectedWorkTime);
         
         const progressSection = document.getElementById('progressSection');
         const progressText = document.getElementById('progressText');
@@ -405,8 +320,7 @@ Object.assign(TodoApp.prototype, {
         progressSection.style.display = 'block';
 
         if (!expectedWorkTime || expectedWorkTime <= 0) {
-            console.log('[PROGRESS_BAR] No expected work time set, showing empty progress bar');
-            // 如果没有设置预期工作时间，显示空的进度条
+            // 没有设置预期工作时间
             progressText.textContent = `工作进度 (未设置预期时间)`;
             progressPercentage.textContent = `已工作: ${this.formatTime(spentTime)}`;
             progressFill.style.width = '0%';
@@ -417,11 +331,6 @@ Object.assign(TodoApp.prototype, {
         // 计算进度百分比
         const progressPercent = Math.min((spentTime / expectedWorkTime) * 100, 100);
         const actualPercent = (spentTime / expectedWorkTime) * 100;
-
-        console.log('[PROGRESS_BAR] Progress calculation:', {
-            progressPercent: progressPercent + '%',
-            actualPercent: actualPercent + '%'
-        });
 
         // 更新文本
         progressText.textContent = `工作进度 (预期: ${this.formatTime(expectedWorkTime)})`;
@@ -440,10 +349,8 @@ Object.assign(TodoApp.prototype, {
             const allTasksCompleted = totalTasks > 0 && completedTasks === totalTasks;
             
             if (allTasksCompleted) {
-                console.log('[PROGRESS_BAR] All tasks completed - applying complete style');
                 progressFill.classList.add('complete');
             } else {
-                console.log('[PROGRESS_BAR] Time exceeded but tasks not complete - applying over-100 style');
                 progressFill.classList.add('over-100');
             }
         }
@@ -571,7 +478,6 @@ Object.assign(TodoApp.prototype, {
     },
 
     addTask() {
-        console.log('[ADD_TASK] Adding new task');
         
         const titleInput = document.getElementById('newTaskInput');
         const durationInput = document.getElementById('taskDurationInput');
@@ -599,8 +505,6 @@ Object.assign(TodoApp.prototype, {
             subtasks: [] // 添加子任务数组
         };
 
-        console.log('[ADD_TASK] Created new task:', newTask);
-
         this.currentChecklist.tasks.push(newTask);
         
         // 清空输入框
@@ -620,7 +524,6 @@ Object.assign(TodoApp.prototype, {
     },
 
     toggleTaskCompletion(taskId) {
-        console.log('[TASK_COMPLETION] Toggling completion for task:', taskId);
         
         const task = this.currentChecklist.tasks.find(t => t.id === taskId);
         if (!task) return;
@@ -631,8 +534,6 @@ Object.assign(TodoApp.prototype, {
         }
 
         task.completed = !task.completed;
-        
-        console.log('[TASK_COMPLETION] Task completion status changed to:', task.completed);
         
         this.saveChecklistChanges();
         this.renderTasksList();
@@ -645,7 +546,6 @@ Object.assign(TodoApp.prototype, {
     },
 
     async deleteTask(taskId) {
-        console.log('[DELETE_TASK] Attempting to delete task:', taskId);
         
         const task = this.currentChecklist.tasks.find(t => t.id === taskId);
         if (!task) return;
@@ -656,7 +556,6 @@ Object.assign(TodoApp.prototype, {
         );
 
         if (result) {
-            console.log('[DELETE_TASK] User confirmed deletion');
             
             // 如果任务正在运行，先停止计时器
             if (task.isRunning) {
@@ -670,15 +569,11 @@ Object.assign(TodoApp.prototype, {
                 this.renderTasksList();
                 this.updateChecklistStats();
                 this.showNotification('任务已删除', 'success');
-                console.log('[DELETE_TASK] Task deleted successfully');
             }
-        } else {
-            console.log('[DELETE_TASK] User cancelled deletion');
         }
     },
 
     async saveChecklistChanges() {
-        console.log('[SAVE_CHANGES] Saving checklist changes for:', this.currentChecklist.id);
         
         try {
             await window.electronAPI.updateChecklist(this.currentChecklist.id, this.currentChecklist);
@@ -688,10 +583,8 @@ Object.assign(TodoApp.prototype, {
             if (index !== -1) {
                 this.data.checklists[index] = { ...this.currentChecklist };
             }
-            
-            console.log('[SAVE_CHANGES] Checklist changes saved successfully');
         } catch (error) {
-            console.error('[SAVE_CHANGES] Error saving checklist changes:', error);
+            console.error('保存清单失败:', error);
             this.showNotification('保存失败', 'error');
         }
     }

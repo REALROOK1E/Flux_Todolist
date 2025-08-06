@@ -16,31 +16,57 @@ body {
 .floating-container {
     width: 100%;
     height: 100%;
-    min-height: 180px; /* 确保容器有足够高度显示所有内容 */
+    min-height: 60px; /* 进一步减少最小高度 */
     display: flex;
     flex-direction: column;
-    background: rgba(37, 99, 235, 0.95);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(37, 99, 235, 0.97);
+    border-radius: 20px; /* 更圆润的圆角 */
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2), 
+                0 4px 16px rgba(37, 99, 235, 0.1); /* 双重阴影 */
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-container:hover {
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.25), 
+                0 6px 20px rgba(37, 99, 235, 0.15);
+    transform: translateY(-1px);
 }
 
 /* 主悬浮窗 */
 .main-float {
-    padding: 12px;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
     color: white;
     -webkit-app-region: drag; /* 头部可拖拽 */
     cursor: move;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.main-float::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.main-float:hover::before {
+    opacity: 1;
 }
 
 .main-float:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
     transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .float-header {
@@ -49,6 +75,35 @@ body {
     align-items: center;
     margin-bottom: 8px;
     -webkit-app-region: drag; /* 头部可拖拽 */
+}
+
+.header-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    -webkit-app-region: no-drag;
+}
+
+.header-btn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    -webkit-app-region: no-drag;
+}
+
+.header-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .checklist-name {
@@ -256,36 +311,6 @@ body {
 
 .task-timer-btn.paused:hover {
     background: #d97706;
-}
-
-/* 控制按钮 */
-.controls {
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    -webkit-app-region: no-drag;
-}
-
-.control-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 4px;
-    width: 24px;
-    height: 24px;
-    color: white;
-    font-size: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.control-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
 }
 
 /* 空状态 */

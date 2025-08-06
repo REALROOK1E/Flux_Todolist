@@ -21,10 +21,7 @@ Object.assign(TodoApp.prototype, {
                     <div class="template-actions">
                         <button class="pixel-btn btn-secondary" onclick="app.editTemplate('${template.id}')" title="编辑">✏</button>
                         <button class="pixel-btn btn-primary" onclick="app.useTemplate('${template.id}')" title="使用">📋</button>
-                        ${template.id !== 'default' && template.id !== 'work' && template.id !== 'study' ? 
-                            `<button class="pixel-btn btn-danger" onclick="app.deleteTemplate('${template.id}')" title="删除">🗑</button>` : 
-                            ''
-                        }
+                        <button class="pixel-btn btn-danger" onclick="app.deleteTemplate('${template.id}')" title="删除">🗑</button>
                     </div>
                 </div>
                 ${template.description ? `<p style="color: #9ca3af; margin: 8px 0; font-size: 14px;">${template.description}</p>` : ''}
@@ -228,12 +225,6 @@ Object.assign(TodoApp.prototype, {
     editTemplate(templateId) {
         const template = this.data.templates.find(t => t.id === templateId);
         if (!template) return;
-
-        // 检查是否为系统默认模板
-        if (['default', 'work', 'study'].includes(templateId)) {
-            this.showNotification('系统默认模板不能编辑', 'warning');
-            return;
-        }
 
         const modalBody = `
             <div class="form-group">
@@ -810,15 +801,15 @@ Object.assign(TodoApp.prototype, {
 
     getAchievementLevel(completionRate, completedSubtasks, totalSubtasks) {
         if (completionRate === 100 && (totalSubtasks === 0 || completedSubtasks === totalSubtasks)) {
-            return { icon: '�', label: '完美完成' };
+            return { icon: '🏆', label: '完美完成' };
         } else if (completionRate >= 90) {
             return { icon: '⭐', label: '出色完成' };
         } else if (completionRate >= 70) {
-            return { icon: '�', label: '良好完成' };
+            return { icon: '👍', label: '良好完成' };
         } else if (completionRate >= 50) {
-            return { icon: '�', label: '部分完成' };
+            return { icon: '📝', label: '部分完成' };
         } else {
-            return { icon: '�', label: '已归档' };
+            return { icon: '📦', label: '已归档' };
         }
     },
 
