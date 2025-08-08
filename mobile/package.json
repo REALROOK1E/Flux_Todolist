@@ -1,0 +1,58 @@
+{
+  "name": "flux-mobile",
+  "version": "1.0.0",
+  "description": "像素风格的 Flux 移动端应用 - 安卓版",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run build && ionic:serve",
+    "build": "node build.js",
+    "ionic:build": "node build.js",
+    "ionic:serve": "npx http-server dist -p 8101 -c-1 --cors",
+    "sync": "ionic cap sync",
+    "copy": "ionic cap copy",
+    "open:android": "ionic cap open android",
+    "run:android": "ionic cap run android",
+    "build:android": "npm run build && ionic cap sync && ionic cap build android",
+    "add:android": "ionic cap add android",
+    "lint": "eslint src/**/*.{js,ts}",
+    "prepare": "npm run build && npm run sync",
+    "dev": "npm run build && npx http-server dist -p 8101 -c-1 --cors",
+    "serve": "npm run dev"
+  },
+  "keywords": [
+    "ionic",
+    "capacitor",
+    "android",
+    "todo",
+    "task",
+    "timer",
+    "pixel",
+    "productivity"
+  ],
+  "author": {
+    "name": "REALROOK1E",
+    "email": "developer@flux.app"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "5.7.8",
+    "@capacitor/app": "^5.0.0",
+    "@capacitor/core": "^5.0.0",
+    "@capacitor/filesystem": "^5.0.0",
+    "@capacitor/haptics": "^5.0.0",
+    "@capacitor/keyboard": "^5.0.0",
+    "@capacitor/local-notifications": "^5.0.0",
+    "@capacitor/preferences": "^5.0.0",
+    "@capacitor/share": "^5.0.0",
+    "@capacitor/splash-screen": "^5.0.0",
+    "@capacitor/status-bar": "^5.0.0",
+    "@ionic/cli": "^7.1.0",
+    "@ionic/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^5.0.0",
+    "eslint": "^8.44.0",
+    "http-server": "^14.1.1",
+    "typescript": "^5.1.0"
+  }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Flux - 像素风格时间流动应用</title>
+    <meta name="description" content="像素风格的时间管理应用">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- Status Bar Style -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Capacitor Core -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css">
+    
+    <!-- 应用样式 -->
+    <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="stylesheet" href="styles/pixel-mobile.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- 图标 -->
+    <link rel="icon" type="image/png" href="assets/icon-192.png">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+</head>
+<body>
+    <ion-app>
+        <!-- 加载动画 -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-content">
+                <div class="pixel-logo">FLUX</div>
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <ion-header>
+            <ion-toolbar>
+                <ion-title id="page-title">Flux</ion-title>
+                <ion-buttons slot="start">
+                    <ion-button id="back-btn" style="display: none;">
+                        <ion-icon name="chevron-back"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+                <ion-buttons slot="end">
+                    <ion-button id="menu-btn">
+                        <ion-icon name="menu"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content id="main-content" class="pixel-content">
+            <!-- 内容将由 JavaScript 动态生成 -->
+        </ion-content>
+
+        <!-- 底部导航 -->
+        <ion-tabs>
+            <ion-tab-bar slot="bottom" class="pixel-tab-bar">
+                <ion-tab-button tab="home" class="pixel-tab">
+                    <ion-icon name="home"></ion-icon>
+                    <ion-label>首页</ion-label>
+                </ion-tab-button>
+                
+                <ion-tab-button tab="checklists" class="pixel-tab">
+                    <ion-icon name="list"></ion-icon>
+                    <ion-label>清单</ion-label>
+                </ion-tab-button>
+                
+                <ion-tab-button tab="timer" class="pixel-tab">
+                    <ion-icon name="timer"></ion-icon>
+                    <ion-label>计时</ion-label>
+                </ion-tab-button>
+                
+                <ion-tab-button tab="templates" class="pixel-tab">
+                    <ion-icon name="library"></ion-icon>
+                    <ion-label>模板</ion-label>
+                </ion-tab-button>
+                
+                <ion-tab-button tab="stats" class="pixel-tab">
+                    <ion-icon name="bar-chart"></ion-icon>
+                    <ion-label>统计</ion-label>
+                </ion-tab-button>
+            </ion-tab-bar>
+        </ion-tabs>
+
+        <!-- 悬浮按钮 -->
+        <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+            <ion-fab-button id="add-fab" class="pixel-fab">
+                <ion-icon name="add"></ion-icon>
+            </ion-fab-button>
+            <ion-fab-list side="top">
+                <ion-fab-button id="add-checklist" class="pixel-fab-small">
+                    <ion-icon name="list"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-button id="add-template" class="pixel-fab-small">
+                    <ion-icon name="library"></ion-icon>
+                </ion-fab-button>
+            </ion-fab-list>
+        </ion-fab>
+    </ion-app>
+
+    <!-- 脚本引入 -->
+    <script type="module" src="js/mobile-app.js"></script>
+    <script type="module" src="js/mobile-storage.js"></script>
+    <script type="module" src="js/mobile-checklist.js"></script>
+    <script type="module" src="js/mobile-timer.js"></script>
+    <script type="module" src="js/mobile-template.js"></script>
+    <script type="module" src="js/mobile-utils.js"></script>
+</body>
+</html>

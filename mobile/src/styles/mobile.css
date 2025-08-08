@@ -1,0 +1,417 @@
+/* 移动端主要样式 */
+:root {
+  --pixel-primary: #00ff00;
+  --pixel-secondary: #ffff00;
+  --pixel-accent: #ff00ff;
+  --pixel-background: #1a1a1a;
+  --pixel-surface: #2d2d2d;
+  --pixel-text: #ffffff;
+  --pixel-text-secondary: #cccccc;
+  --pixel-border: #444444;
+  --pixel-success: #00ff00;
+  --pixel-warning: #ffff00;
+  --pixel-danger: #ff0000;
+  --pixel-spacing: 8px;
+  --pixel-border-radius: 4px;
+}
+
+/* 基础样式重置 */
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+html, body {
+  font-family: 'Courier New', monospace;
+  background: var(--pixel-background);
+  color: var(--pixel-text);
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ion组件自定义 */
+ion-app {
+  background: var(--pixel-background);
+}
+
+ion-header {
+  --background: var(--pixel-surface);
+  --color: var(--pixel-text);
+  --border-color: var(--pixel-border);
+  border-bottom: 2px solid var(--pixel-border);
+}
+
+ion-toolbar {
+  --background: transparent;
+  --color: var(--pixel-text);
+  --min-height: 56px;
+}
+
+ion-title {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+ion-content {
+  --background: var(--pixel-background);
+  --color: var(--pixel-text);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+}
+
+/* 按钮样式 */
+ion-button {
+  --background: var(--pixel-surface);
+  --background-activated: var(--pixel-primary);
+  --color: var(--pixel-text);
+  --border-color: var(--pixel-border);
+  --border-style: solid;
+  --border-width: 2px;
+  --border-radius: var(--pixel-border-radius);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 4px;
+  height: 40px;
+}
+
+ion-button:hover {
+  --background: var(--pixel-primary);
+  --color: var(--pixel-background);
+}
+
+/* 卡片样式 */
+ion-card {
+  --background: var(--pixel-surface);
+  --color: var(--pixel-text);
+  border: 2px solid var(--pixel-border);
+  border-radius: var(--pixel-border-radius);
+  margin: var(--pixel-spacing);
+  box-shadow: 4px 4px 0px rgba(0, 255, 0, 0.3);
+}
+
+ion-card-header {
+  --background: transparent;
+  --color: var(--pixel-text);
+  border-bottom: 1px solid var(--pixel-border);
+}
+
+ion-card-title {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+ion-card-subtitle {
+  font-family: 'Courier New', monospace;
+  color: var(--pixel-text-secondary);
+  font-size: 12px;
+}
+
+/* 列表样式 */
+ion-list {
+  --background: transparent;
+  background: transparent;
+}
+
+ion-item {
+  --background: var(--pixel-surface);
+  --border-color: var(--pixel-border);
+  --color: var(--pixel-text);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 48px;
+  border: 1px solid var(--pixel-border);
+  margin: 4px 0;
+  border-radius: var(--pixel-border-radius);
+  font-family: 'Courier New', monospace;
+}
+
+ion-item:hover {
+  --background: var(--pixel-primary);
+  --color: var(--pixel-background);
+}
+
+ion-label {
+  font-family: 'Courier New', monospace;
+  font-weight: normal;
+}
+
+/* 输入框样式 */
+ion-input, ion-textarea {
+  --background: var(--pixel-surface);
+  --color: var(--pixel-text);
+  --placeholder-color: var(--pixel-text-secondary);
+  --border-color: var(--pixel-border);
+  --border-style: solid;
+  --border-width: 2px;
+  --border-radius: var(--pixel-border-radius);
+  font-family: 'Courier New', monospace;
+  margin: 4px 0;
+}
+
+ion-input:focus, ion-textarea:focus {
+  --border-color: var(--pixel-primary);
+}
+
+/* 底部导航栏 */
+.pixel-tab-bar {
+  --background: var(--pixel-surface);
+  --border: 2px solid var(--pixel-border);
+  border-top: 2px solid var(--pixel-border);
+  height: 60px;
+}
+
+.pixel-tab {
+  --color: var(--pixel-text-secondary);
+  --color-selected: var(--pixel-primary);
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pixel-tab ion-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+/* 悬浮按钮 */
+.pixel-fab {
+  --background: var(--pixel-primary);
+  --color: var(--pixel-background);
+  --border-color: var(--pixel-border);
+  --border-style: solid;
+  --border-width: 2px;
+  --box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
+}
+
+.pixel-fab-small {
+  --background: var(--pixel-secondary);
+  --color: var(--pixel-background);
+  --border-color: var(--pixel-border);
+  --border-style: solid;
+  --border-width: 2px;
+  --box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+  width: 40px;
+  height: 40px;
+}
+
+/* 加载动画 */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--pixel-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.pixel-logo {
+  font-family: 'Courier New', monospace;
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--pixel-primary);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.7);
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  background: var(--pixel-primary);
+  border-radius: 0;
+  animation: pixelBlink 1.4s infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes pixelBlink {
+  0%, 80%, 100% { 
+    opacity: 0;
+    transform: scale(1);
+  }
+  40% { 
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* 进度条 */
+.progress-bar {
+  width: 100%;
+  height: 16px;
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  border-radius: var(--pixel-border-radius);
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--pixel-primary);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.1) 2px,
+    rgba(255, 255, 255, 0.1) 4px
+  );
+}
+
+/* 时间显示 */
+.time-display {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--pixel-primary);
+  text-align: center;
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  border-radius: var(--pixel-border-radius);
+  padding: 16px;
+  margin: 16px 0;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.7);
+}
+
+/* 统计卡片 */
+.stat-card {
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  border-radius: var(--pixel-border-radius);
+  padding: 16px;
+  margin: 8px;
+  text-align: center;
+  box-shadow: 2px 2px 0px rgba(0, 255, 0, 0.3);
+}
+
+.stat-value {
+  font-family: 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--pixel-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--pixel-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  ion-content {
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
+  
+  .pixel-logo {
+    font-size: 24px;
+  }
+  
+  .time-display {
+    font-size: 20px;
+  }
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  /* 已经是暗色主题，无需额外适配 */
+}
+
+/* 安全区域适配 */
+ion-content {
+  --padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-header {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* 触摸反馈 */
+.touchable {
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.touchable:active {
+  transform: scale(0.95);
+}
+
+/* 模态框样式 */
+ion-modal {
+  --background: var(--pixel-background);
+  --color: var(--pixel-text);
+}
+
+ion-modal ion-header {
+  --background: var(--pixel-surface);
+}
+
+ion-modal ion-content {
+  --background: var(--pixel-background);
+}
+
+/* 警告框样式 */
+ion-alert {
+  --background: var(--pixel-surface);
+  --color: var(--pixel-text);
+  font-family: 'Courier New', monospace;
+}
+
+ion-alert .alert-button {
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}

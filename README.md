@@ -1,10 +1,18 @@
 # Flux - 像素风格时间流动应用
 
-[![Version](https://img.shields.io/badge/version-2.15.0-blue.svg)](https://github.com/REALROOK1E/Flux/releases/tag/v2.15.0)
-[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)]()
+[![Version](https://img.shields.io/badge/version-2.16.0-blue.svg)](https://github.com/REALROOK1E/Flux/releases/tag/v2.16.0)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android-lightgrey.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 
+
+##重大更新 2025.8.8
+🎉 **安卓版本正式发布！**
+- 全新的移动端体验，专为触屏设备优化
+- 保留所有桌面版功能，包括计时、清单、模板等
+- 支持本地通知和触觉反馈
+- 离线数据存储，随时随地使用
+- 查看 [安卓版安装指南](#安卓版安装)
 
 ##重大更新 2025.8.7
 1.增加了悬浮窗的设计，在主页右上角可以显示。
@@ -34,9 +42,36 @@
 
 ## 📥 下载安装
 
-### 最新版本 v2.15.0 (2025-08-07)
+### 桌面版 (Windows)
+#### 最新版本 v2.16.0 (2025-08-08)
 直接进入release：
 https://github.com/REALROOK1E/Mytodo/releases/tag/v2.16
+
+### 安卓版安装
+#### 方式一：自行构建 (推荐)
+```bash
+# 克隆项目
+git clone https://github.com/REALROOK1E/Mytodo.git
+cd Mytodo
+
+# 运行安装脚本
+# Windows:
+mobile\install.bat
+
+# Linux/Mac:
+chmod +x mobile/install.sh
+./mobile/install.sh
+```
+
+#### 方式二：手动安装
+1. 确保已安装 Node.js 16+ 和 Android Studio
+2. 安装 Ionic CLI: `npm install -g @ionic/cli`
+3. 进入 mobile 目录: `cd mobile`
+4. 安装依赖: `npm install`
+5. 构建项目: `ionic build`
+6. 添加安卓平台: `ionic cap add android`
+7. 同步项目: `ionic cap sync`
+8. 打开 Android Studio: `ionic cap open android`
 
 请访问我的网站ernestli.site,右侧有个悬浮窗，点击也可以进入，主要是进我网站看看!
 ### 版本更新 🆕
@@ -89,16 +124,17 @@ https://github.com/REALROOK1E/Mytodo/releases/tag/v2.16
 
 ## 安装运行
 
-### 开发环境需求
+### 桌面版 (Electron)
+#### 开发环境需求
 - Node.js (建议 16.x 或更高版本)
 - npm 或 yarn
 
-### 安装依赖
+#### 安装依赖
 ```bash
 npm install
 ```
 
-### 运行应用
+#### 运行应用
 ```bash
 # 开发模式
 npm run dev
@@ -107,7 +143,7 @@ npm run dev
 npm start
 ```
 
-### 构建应用
+#### 构建应用
 ```bash
 # 构建 Windows 版本
 npm run build-win
@@ -116,7 +152,19 @@ npm run build-win
 npm run build
 ```
 
-## 快捷键
+### 安卓版 (Capacitor)
+详细安装步骤请参考 [安卓版安装指南](#安卓版安装)
+
+#### 快速开始
+```bash
+cd mobile
+npm install
+ionic build
+ionic cap sync
+ionic cap run android
+```
+
+## 快捷键 (桌面版)
 
 | 快捷键 | 功能 |
 |--------|------|
@@ -136,6 +184,11 @@ flux/
 ├── index.html        # 主界面
 ├── package.json      # 项目配置
 ├── data.json         # 数据存储文件（自动创建）
+├── mobile/           # 安卓版本
+│   ├── src/          # 移动端源代码
+│   ├── android/      # 安卓原生项目
+│   ├── capacitor.config.json # Capacitor 配置
+│   └── package.json  # 移动端项目配置
 ├── styles/           # 样式文件
 │   ├── main.css      # 主样式
 │   └── pixel.css     # 像素风格样式
@@ -176,14 +229,24 @@ flux/
 
 ## 技术栈
 
+### 桌面版 (Electron)
 - **框架**: Electron 28.3.3
 - **前端**: HTML5 + CSS3 + Vanilla JavaScript (ES6+)
 - **数据存储**: JSON 文件本地存储
 - **构建工具**: electron-builder 24.13.3
-- **版本**: v2.15.0
+
+### 安卓版 (Capacitor)
+- **框架**: Capacitor 5.0 + Ionic 7.0
+- **前端**: HTML5 + CSS3 + Vanilla JavaScript (ES6+)
+- **数据存储**: Capacitor Preferences + Filesystem
+- **原生功能**: 本地通知、触觉反馈、分享等
+
+- **版本**: v2.16.0
 
 ## 开发计划
 
+- [x] ~~安卓版本开发~~
+- [ ] iOS 版本开发
 - [ ] 添加更多主题选项
 - [ ] 支持插件系统
 - [ ] 添加统计图表

@@ -1,0 +1,57 @@
+# 忽略依赖
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 忽略构建输出
+dist/
+build/
+www/
+
+# 忽略原生项目文件
+android/
+ios/
+
+# 忽略临时文件
+.tmp/
+.temp/
+
+# 忽略日志文件
+*.log
+
+# 忽略编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 忽略操作系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 忽略环境配置
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 忽略覆盖率报告
+coverage/
+
+# 忽略调试文件
+*.tgz
+*.tar.gz
+
+# 忽略缓存
+.cache/
+
+# 忽略 Capacitor 生成文件
+capacitor.config.ts.bak

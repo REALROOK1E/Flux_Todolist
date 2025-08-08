@@ -1,0 +1,409 @@
+/* 移动端像素风格增强样式 */
+
+/* 像素字体增强 */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.pixel-font {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+/* 像素边框和阴影效果 */
+.pixel-border {
+  border: 2px solid var(--pixel-border);
+  border-radius: 0;
+  position: relative;
+}
+
+.pixel-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid var(--pixel-primary);
+  border-radius: 0;
+  z-index: -1;
+}
+
+.pixel-shadow {
+  box-shadow: 
+    4px 4px 0px rgba(0, 0, 0, 0.8),
+    2px 2px 0px var(--pixel-primary);
+}
+
+/* 像素按钮增强效果 */
+.pixel-button {
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  color: var(--pixel-text);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+  margin: 4px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pixel-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.pixel-button:hover::before {
+  left: 100%;
+}
+
+.pixel-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.pixel-button.primary {
+  background: var(--pixel-primary);
+  color: var(--pixel-background);
+  border-color: var(--pixel-primary);
+}
+
+.pixel-button.secondary {
+  background: var(--pixel-secondary);
+  color: var(--pixel-background);
+  border-color: var(--pixel-secondary);
+}
+
+.pixel-button.danger {
+  background: var(--pixel-danger);
+  color: var(--pixel-text);
+  border-color: var(--pixel-danger);
+}
+
+/* 像素输入框效果 */
+.pixel-input {
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  color: var(--pixel-text);
+  font-family: 'Courier New', monospace;
+  padding: 8px 12px;
+  margin: 4px 0;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.pixel-input:focus {
+  outline: none;
+  border-color: var(--pixel-primary);
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+}
+
+.pixel-input::placeholder {
+  color: var(--pixel-text-secondary);
+  font-style: italic;
+}
+
+/* 像素开关效果 */
+.pixel-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pixel-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: var(--pixel-text);
+  border: 1px solid var(--pixel-border);
+  transition: transform 0.2s ease;
+}
+
+.pixel-toggle.active {
+  background: var(--pixel-primary);
+}
+
+.pixel-toggle.active::after {
+  transform: translateX(26px);
+  background: var(--pixel-background);
+}
+
+/* 像素进度条增强 */
+.pixel-progress {
+  width: 100%;
+  height: 20px;
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.pixel-progress-bar {
+  height: 100%;
+  background: var(--pixel-primary);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.pixel-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.2) 3px,
+    rgba(255, 255, 255, 0.2) 6px
+  );
+  animation: pixelStripes 2s linear infinite;
+}
+
+@keyframes pixelStripes {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(12px); }
+}
+
+/* 像素通知效果 */
+.pixel-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-primary);
+  color: var(--pixel-text);
+  padding: 12px 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  z-index: 10000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
+}
+
+.pixel-notification.show {
+  transform: translateX(0);
+}
+
+.pixel-notification.success {
+  border-color: var(--pixel-success);
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.pixel-notification.warning {
+  border-color: var(--pixel-warning);
+  background: rgba(255, 255, 0, 0.1);
+}
+
+.pixel-notification.error {
+  border-color: var(--pixel-danger);
+  background: rgba(255, 0, 0, 0.1);
+}
+
+/* 像素模态框 */
+.pixel-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.pixel-modal-content {
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  max-width: 400px;
+  width: 100%;
+  padding: 20px;
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.8);
+}
+
+.pixel-modal-header {
+  border-bottom: 1px solid var(--pixel-border);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.pixel-modal-title {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--pixel-primary);
+}
+
+.pixel-modal-actions {
+  text-align: right;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--pixel-border);
+}
+
+/* 像素加载动画 */
+.pixel-spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  position: relative;
+}
+
+.pixel-spinner::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--pixel-primary);
+  border-radius: 0;
+  border-top-color: transparent;
+  animation: pixelSpin 1s linear infinite;
+}
+
+@keyframes pixelSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* 像素标签 */
+.pixel-tag {
+  display: inline-block;
+  background: var(--pixel-secondary);
+  color: var(--pixel-background);
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  border: 1px solid var(--pixel-border);
+  margin: 2px;
+}
+
+.pixel-tag.success { background: var(--pixel-success); }
+.pixel-tag.warning { background: var(--pixel-warning); }
+.pixel-tag.danger { background: var(--pixel-danger); }
+
+/* 像素时间显示增强 */
+.pixel-timer {
+  font-family: 'Courier New', monospace;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--pixel-primary);
+  text-align: center;
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  padding: 20px;
+  margin: 16px 0;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.pixel-timer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 0, 0.1),
+    transparent
+  );
+  animation: pixelGlow 3s ease-in-out infinite;
+}
+
+@keyframes pixelGlow {
+  0%, 100% { left: -100%; }
+  50% { left: 100%; }
+}
+
+/* 像素网格背景 */
+.pixel-grid {
+  background-image: 
+    linear-gradient(rgba(68, 68, 68, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(68, 68, 68, 0.3) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+/* 像素卡片增强 */
+.pixel-card {
+  background: var(--pixel-surface);
+  border: 2px solid var(--pixel-border);
+  margin: 8px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.pixel-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 2px var(--pixel-primary);
+}
+
+.pixel-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-top: 12px solid var(--pixel-primary);
+}
+
+/* 响应式像素效果 */
+@media (max-width: 480px) {
+  .pixel-timer {
+    font-size: 20px;
+    padding: 12px;
+  }
+  
+  .pixel-modal-content {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .pixel-notification {
+    right: 10px;
+    top: 10px;
+    font-size: 10px;
+  }
+}
